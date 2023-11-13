@@ -2,24 +2,24 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-byte readByteFromPC(word* pc, const Mem* mem, u32* cycles) {
-   byte data = mem->data[*pc];
+byte readByteFromPC(word* pc, const RAM* ram, u32* cycles) {
+   byte data = ram->data[*pc];
    (*pc)++;
    (*cycles)--;
 
    return data;
 }
 
-byte readByteFromAddr(word addr, const Mem* mem, u32* cycles) {
-   byte data = mem->data[addr];
+byte readByteFromAddr(word addr, const RAM* ram, u32* cycles) {
+   byte data = ram->data[addr];
    (*cycles)--;
 
    return data;
 }
 
-word readWordFromPC(word* pc, const Mem* mem, u32* cycles) {
-   byte loB = readByteFromPC(pc, mem, cycles);
-   byte hiB = readByteFromPC(pc, mem, cycles);
+word readWordFromPC(word* pc, const RAM* ram, u32* cycles) {
+   byte loB = readByteFromPC(pc, ram, cycles);
+   byte hiB = readByteFromPC(pc, ram, cycles);
 
 #ifdef DEBUG
    printf("\tRead word. loB=[0x%X], hiB=[0x%X]\n", loB, hiB);
@@ -28,9 +28,9 @@ word readWordFromPC(word* pc, const Mem* mem, u32* cycles) {
    return (word)(loB | (hiB << 8));
 }
 
-word readWordFromAddr(word addr, const Mem* mem, u32* cycles) {
-   byte loB = readByteFromAddr(addr, mem, cycles);
-   byte hiB = readByteFromAddr(addr + 1, mem, cycles);
+word readWordFromAddr(word addr, const RAM* ram, u32* cycles) {
+   byte loB = readByteFromAddr(addr, ram, cycles);
+   byte hiB = readByteFromAddr(addr + 1, ram, cycles);
 
 #ifdef DEBUG
    printf("\tRead word from [0x%X+0x%X]. loB=[0x%X], hiB=[0x%X]\n", addr, addr + 1, loB, hiB);
@@ -39,11 +39,11 @@ word readWordFromAddr(word addr, const Mem* mem, u32* cycles) {
    return (word)(loB | (hiB << 8));
 }
 
-void pushWordToStack(Mem* mem, byte* sp, word val, u32* cycles) {
+void pushWordToStack(RAM* ram, byte* sp, word val, u32* cycles) {
    (*sp)--;
-   mem->data[*sp] = val & 0xFF;
+   ram->data[*sp] = val & 0xFF;
    (*sp)--;
-   mem->data[*sp] = val >> 8;
+   ram->data[*sp] = val >> 8;
 
    (*cycles) -= 2;
 
@@ -53,10 +53,10 @@ void pushWordToStack(Mem* mem, byte* sp, word val, u32* cycles) {
 
 }
 
-word popWordFromStack(const Mem* mem, byte* sp, u32* cycles) {
-   byte hB = mem->data[*sp];
+word popWordFromStack(const RAM* ram, byte* sp, u32* cycles) {
+   byte hB = ram->data[*sp];
    (*sp)++;
-   byte lB = mem->data[*sp];
+   byte lB = ram->data[*sp];
    (*sp)++;
    (*cycles) -= 4;
 
@@ -69,7 +69,13 @@ void setNAndZFlags(CPU* cpu) {
    cpu->n = (cpu->a & 0b10000000) > 0;
 }
 
-void reset(CPU* cpu, Mem* mem) {
+void resetRAM(RAM* ram) {
+   for (u32 i = 0; i < MEM_MAX; i++) {
+      ram->data[i] = 0;
+   }
+}
+
+void resetCPU(CPU* cpu, RAM* ram) {
    cpu->pc = 0xFFFC;
    cpu->sp = 0x10;
    cpu->d = 0;
@@ -86,85 +92,79 @@ void reset(CPU* cpu, Mem* mem) {
    cpu->x = 0;
    cpu->y = 0;
 
-   initMem(mem);
+   resetRAM(ram);
 }
 
-void initMem(Mem* mem) {
-   for (u32 i = 0; i < MEM_MAX; i++) {
-      mem->data[i] = 0;
-   }
-}
-
-void exec(CPU* cpu, Mem* mem, u32 cycles) {
+void exec(CPU* cpu, RAM* ram, u32 cycles) {
    while (cycles > 0) {
-      byte nextIns = readByteFromPC(cpu, mem, &cycles);
+      byte nextIns = readByteFromPC(&cpu->pc, ram, &cycles);
 #ifdef DEBUG
       printf("Instruction: 0x%X\n", nextIns);
 #endif
       switch (nextIns) {
       case INS_JSR: {
-         word addr = readWordFromPC(&cpu->pc, mem, &cycles);
-         pushWordToStack(mem, &cpu->sp, cpu->pc - 1, &cycles);
+         word addr = readWordFromPC(&cpu->pc, ram, &cycles);
+         pushWordToStack(ram, &cpu->sp, cpu->pc - 1, &cycles);
 
          cpu->pc = addr;
          cycles--;
       } break;
       case INS_RTS: {
-         word addr = popWordFromStack(mem, &cpu->sp, &cycles);
+         word addr = popWordFromStack(ram, &cpu->sp, &cycles);
          cpu->pc = addr;
          cycles--;
       } break;
       case INS_LDA_IM: {
-         byte val = readByteFromPC(&cpu->pc, mem, &cycles);
+         byte val = readByteFromPC(&cpu->pc, ram, &cycles);
          cpu->a = val;
          setNAndZFlags(cpu);
       } break;
       case INS_LDA_ZP: {
-         byte zpAddr = readByteFromPC(&cpu->pc, mem, &cycles);
-         cpu->a = readByteFromAddr(zpAddr, mem, &cycles);
+         byte zpAddr = readByteFromPC(&cpu->pc, ram, &cycles);
+         cpu->a = readByteFromAddr(zpAddr, ram, &cycles);
          setNAndZFlags(cpu);
       } break;
       case INS_LDA_ZPX: {
-         byte zpAddr = readByteFromPC(&cpu->pc, mem, &cycles);
+         byte zpAddr = readByteFromPC(&cpu->pc, ram, &cycles);
          zpAddr += cpu->x;
 
-         cpu->a = readByteFromAddr(zpAddr, mem, &cycles);
+         cpu->a = readByteFromAddr(zpAddr, ram, &cycles);
          setNAndZFlags(cpu);
       } break;
       case INS_LDA_ABS: {
-         word absAddr = readWordFromPC(&cpu->pc, mem, &cycles);
+         word absAddr = readWordFromPC(&cpu->pc, ram, &cycles);
          cycles--;
 
-         cpu->a = readByteFromAddr(absAddr, mem, &cycles);
+         cpu->a = readByteFromAddr(absAddr, ram, &cycles);
          setNAndZFlags(cpu);
       } break;
       case INS_LDA_ABSX: {
-         word absAddr = readWordFromPC(&cpu->pc, mem, &cycles);
+         word absAddr = readWordFromPC(&cpu->pc, ram, &cycles);
          word absAddrX = absAddr + cpu->x;
          const bool crossed = (absAddr ^ absAddrX) >> 8;
          if (crossed) {
             cycles--;
          }
-         cpu->a = readByteFromAddr(absAddrX, mem, &cycles);
+         cpu->a = readByteFromAddr(absAddrX, ram, &cycles);
          setNAndZFlags(cpu);
       } break;
       case INS_LDA_ABSY: {
-         word absAddr = readWordFromPC(&cpu->pc, mem, &cycles);
+         word absAddr = readWordFromPC(&cpu->pc, ram, &cycles);
          word absAddrY = absAddr + cpu->y;
          const bool crossed = (absAddr ^ absAddrY) >> 8;
          if (crossed) {
             cycles--;
          }
-         cpu->a = readByteFromAddr(absAddrY, mem, &cycles);
+         cpu->a = readByteFromAddr(absAddrY, ram, &cycles);
          setNAndZFlags(cpu);
       } break;
       case INS_LDA_INDX: {
-         byte addrZp = readByteFromPC(&cpu->pc, mem, &cycles);
+         byte addrZp = readByteFromPC(&cpu->pc, ram, &cycles);
          addrZp += cpu->x;
          cycles--;
-         word addr = readWordFromAddr(addrZp, mem, &cycles);
+         word addr = readWordFromAddr(addrZp, ram, &cycles);
          
-         cpu->a = readByteFromAddr(addr, mem, &cycles);
+         cpu->a = readByteFromAddr(addr, ram, &cycles);
          setNAndZFlags(cpu);
       } break;
       default: {

@@ -20,38 +20,38 @@ extern "C" {
 #define INS_LDA_ABSY 0xB9  //Absolute Y. Takes 4(+1) cycles
 #define INS_LDA_INDX 0xA1  //Indirect X. Takes 6 cycles.
 
-   typedef unsigned char byte;
-   typedef unsigned short word;
-   typedef unsigned int u32;
+typedef unsigned char byte;
+typedef unsigned short word;
+typedef unsigned int u32;
 
-   struct Mem {
-      byte data[MEM_MAX];
-   };
+struct RAM {
+   byte data[MEM_MAX];
+};
 
-   struct CPU {
-      word pc;
-      byte sp;
+struct CPU {
+   word pc;
+   byte sp;
 
-      byte a;
-      byte x;
-      byte y;
-      byte ps;
+   byte a;
+   byte x;
+   byte y;
+   byte ps;
 
-      byte c : 1;
-      byte z : 1;
-      byte i : 1;
-      byte d : 1;
-      byte b : 1;
-      byte v : 1;
-      byte n : 1;
-   };
+   byte c : 1;
+   byte z : 1;
+   byte i : 1;
+   byte d : 1;
+   byte b : 1;
+   byte v : 1;
+   byte n : 1;
+};
 
-   typedef struct Mem Mem;
-   typedef struct CPU CPU;
+typedef struct RAM RAM;
+typedef struct CPU CPU;
 
-   void reset(CPU* cpu, Mem* mem);
-   void initMem(Mem* mem);
-   void exec(CPU* cpu, Mem* mem, u32 cycles);
+void resetCPU(CPU* cpu, RAM* ram);
+void resetRAM(RAM* ram);
+void exec(CPU* cpu, RAM* ram, u32 cycles);
 
 #ifdef __cplusplus
 }
