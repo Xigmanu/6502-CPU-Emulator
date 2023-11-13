@@ -3,10 +3,6 @@
 #define CPU_H
 #define DEBUG
 
-#ifdef _cplusplus
-extern "C" {
-#endif // _cplusplus
-
 #include <stdlib.h>
 
 #define MEM_MAX 65536      //(64 * 1024)
@@ -49,11 +45,9 @@ struct CPU {
 typedef struct RAM RAM;
 typedef struct CPU CPU;
 
+
 void resetCPU(CPU* cpu, RAM* ram);
 void resetRAM(RAM* ram);
 void exec(CPU* cpu, RAM* ram, u32 cycles);
 
-#ifdef __cplusplus
-}
-#endif
 #endif // !CPU_H

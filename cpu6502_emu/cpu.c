@@ -78,7 +78,6 @@ void resetRAM(RAM* ram) {
 void resetCPU(CPU* cpu, RAM* ram) {
    cpu->pc = 0xFFFC;
    cpu->sp = 0x10;
-   cpu->d = 0;
 
    cpu->c = 0;
    cpu->z = 0;
