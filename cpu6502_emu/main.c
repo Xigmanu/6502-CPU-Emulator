@@ -1,18 +1,24 @@
 #include "cpu.h"
+#include <stdio.h>
+#ifdef _DEBUG
+#define TEST
+#endif
 
+
+#ifndef TEST
 int main() {
-   CPU cpu;
-   Mem mem;
-
-   reset(&cpu, &mem);
-   mem.data[0xFFFC] = INS_JSR;
-   mem.data[0xFFFD] = 0x42;
-   mem.data[0xFFFE] = 0x42;
-   mem.data[0x4242] = INS_LDA_IM;
-   mem.data[0x4243] = 0x82;
-   mem.data[0x4244] = INS_RTS;
-   mem.data[0xFFFF] = 0x24;
-   exec(&cpu, &mem, 14);
-
    return 0;
 }
+#else
+#include "test.h"
+int main() {
+   printf("TESTING\n");
+
+   testResetCPU();
+   testLDAImmediate();
+   testLDAZeroPage();
+
+   printf("\nFINISHED TESTING");
+   return 0;
+}
+#endif // !TEST
