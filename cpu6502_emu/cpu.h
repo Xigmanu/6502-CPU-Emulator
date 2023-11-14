@@ -21,7 +21,7 @@ typedef unsigned short word;
 typedef unsigned int u32;
 
 struct RAM {
-   byte data[MEM_MAX];
+   byte* data;
 };
 
 struct CPU {
@@ -45,9 +45,9 @@ struct CPU {
 typedef struct RAM RAM;
 typedef struct CPU CPU;
 
-
-void resetCPU(CPU* cpu, RAM* ram);
-void resetRAM(RAM* ram);
+void resetCPU(CPU* cpu);
+RAM* initRAM();
+void freeRAM(RAM* ram);
 void exec(CPU* cpu, RAM* ram, u32 cycles);
 
 #endif // !CPU_H

@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#pragma region Private
+
 byte readByteFromPC(word* pc, const RAM* ram, u32* cycles) {
    byte data = ram->data[*pc];
    (*pc)++;
@@ -22,7 +24,7 @@ word readWordFromPC(word* pc, const RAM* ram, u32* cycles) {
    byte hiB = readByteFromPC(pc, ram, cycles);
 
 #ifdef DEBUG
-   printf("\tRead word. loB=[0x%X], hiB=[0x%X]\n", loB, hiB);
+   printf("DEBUG: Read word. loB=[0x%X], hiB=[0x%X]\n", loB, hiB);
 #endif // DEBUG
 
    return (word)(loB | (hiB << 8));
@@ -33,7 +35,7 @@ word readWordFromAddr(word addr, const RAM* ram, u32* cycles) {
    byte hiB = readByteFromAddr(addr + 1, ram, cycles);
 
 #ifdef DEBUG
-   printf("\tRead word from [0x%X+0x%X]. loB=[0x%X], hiB=[0x%X]\n", addr, addr + 1, loB, hiB);
+   printf("DEBUG: Read word from [0x%X+0x%X]. loB=[0x%X], hiB=[0x%X]\n", addr, addr + 1, loB, hiB);
 #endif // DEBUG
 
    return (word)(loB | (hiB << 8));
@@ -48,7 +50,7 @@ void pushWordToStack(RAM* ram, byte* sp, word val, u32* cycles) {
    (*cycles) -= 2;
 
 #ifdef DEBUG
-   printf("\tPushed [0x%X] to the stack. Current sp: [0x%X]\n", val, *sp);
+   printf("DEBUG: Pushed [0x%X] to the stack. Current sp: [0x%X]\n", val, *sp);
 #endif // DEBUG
 
 }
@@ -69,13 +71,40 @@ void setNAndZFlags(CPU* cpu) {
    cpu->n = (cpu->a & 0b10000000) > 0;
 }
 
-void resetRAM(RAM* ram) {
-   for (u32 i = 0; i < MEM_MAX; i++) {
-      ram->data[i] = 0;
+#pragma endregion
+
+RAM* initRAM() {
+   RAM* ram = malloc(sizeof(RAM));
+   if (NULL == ram) {
+      printf("Allocation error.");
+      return NULL;
    }
+
+   ram->data = (byte*)calloc(MEM_MAX, sizeof(byte)); //Allocate MEM_MAX*1B on the heap.
+   if (NULL == ram->data) {
+      printf("Allocation error");
+      free(ram);
+      return NULL;
+   }
+
+#ifdef _DEBUG
+   printf("DEBUG: Allocated [%llu B] to RAM\n", MEM_MAX * sizeof(byte));
+#endif // _DEBUG
+
+
+   return ram;
 }
 
-void resetCPU(CPU* cpu, RAM* ram) {
+//Does not set RAM ptr to NULL.
+void freeRAM(RAM* ram) {
+   free(ram->data);
+   free(ram);
+#ifdef _DEBUG
+   printf("DEBUG: Freed allocated memory\n");
+#endif
+}
+
+void resetCPU(CPU* cpu) {
    cpu->pc = 0xFFFC;
    cpu->sp = 0x10;
 
@@ -90,15 +119,13 @@ void resetCPU(CPU* cpu, RAM* ram) {
    cpu->a = 0;
    cpu->x = 0;
    cpu->y = 0;
-
-   resetRAM(ram);
 }
 
 void exec(CPU* cpu, RAM* ram, u32 cycles) {
    while (cycles > 0) {
       byte nextIns = readByteFromPC(&cpu->pc, ram, &cycles);
 #ifdef DEBUG
-      printf("Instruction: 0x%X\n", nextIns);
+      printf("DEBUG: Instruction: 0x%X\n", nextIns);
 #endif
       switch (nextIns) {
       case INS_JSR: {
@@ -167,7 +194,7 @@ void exec(CPU* cpu, RAM* ram, u32 cycles) {
          setNAndZFlags(cpu);
       } break;
       default: {
-         printf("Unsupported instruction: %d", nextIns);
+         printf("DEBUG: Unsupported instruction: %d", nextIns);
       }
       }
    }
