@@ -2,25 +2,25 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#pragma region Private
+#pragma region Helpers
 
 byte readByteFromPC(word* pc, const RAM* ram, u32* cycles) {
    byte val = ram->data[*pc];
 #ifdef _DEBUG
-   printf("DEBUG\t| Read byte [0x%X] from PC: [0x%X]\n", val, *pc);
+   printf("DEBUG\t| Read byte [0x%X] from RAM. PC: [0x%X]\n", val, *pc);
 #endif //_DEBUG
    (*pc)++;
-   (*cycles)--;
+   (*cycles)++;
 
    return val;
 }
 
 byte readByteFromAddr(word addr, const RAM* ram, u32* cycles) {
    byte val = ram->data[addr];
-   (*cycles)--;
+   (*cycles)++;
 
 #ifdef _DEBUG
-   printf("DEBUG\t| Read byte [0x%X] from ADDR: [0x%X]\n", val, addr);
+   printf("DEBUG\t| Read byte [0x%X] from RAM. ADDR: [0x%X]\n", val, addr);
 #endif //_DEBUG
 
    return val;
@@ -54,8 +54,7 @@ void pushWordToStack(RAM* ram, byte* sp, word val, u32* cycles) {
    (*sp)--;
    ram->data[*sp] = val >> 8;
 
-   (*cycles) -= 2;
-
+   (*cycles) += 2;
 #ifdef _DEBUG
    printf("DEBUG\t| Pushed [0x%X] to the stack. Current SP: [0x%X]\n", val, *sp);
 #endif // _DEBUG
@@ -66,7 +65,7 @@ word popWordFromStack(const RAM* ram, byte* sp, u32* cycles) {
    (*sp)++;
    byte lB = ram->data[*sp];
    (*sp)++;
-   (*cycles) -= 4;
+   (*cycles) += 4;
 
    word val = (word)((hB << 8) | lB);
 
@@ -79,13 +78,136 @@ word popWordFromStack(const RAM* ram, byte* sp, u32* cycles) {
 
 void setLDAFlags(CPU* cpu) {
    cpu->z = (cpu->a == 0);
-   cpu->n = (cpu->a & 0b10000000) > 0;
+   cpu->n = (cpu->a & 0x80) > 0;
 #ifdef _DEBUG
-   printf("DEBUG\t| Set LDA Flags: Z: [0x%X], N: [0x%X]\n", cpu->z, cpu->n);
+   printf("DEBUG\t| Set Flags: Z: [0x%X], N: [0x%X]\n", cpu->z, cpu->n);
+#endif // _DEBUG
+}
+
+void setADCFlags(CPU* cpu, word sum, byte op) {
+   setLDAFlags(cpu);
+   cpu->c = sum > 0xFF;
+   cpu->v = ((cpu->a ^ op) & 0x80) && ((cpu->a ^ sum) & 0x80);
+#ifdef _DEBUG
+   printf("DEBUG\t| Set Flags: C: [0x%X], V: [0x%X]\n", cpu->c, cpu->v);
 #endif // _DEBUG
 }
 
 #pragma endregion
+
+#pragma region Instruction handlers
+
+void jsr(CPU* cpu, RAM* ram) {
+   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+   pushWordToStack(ram, &cpu->sp, cpu->pc - 1, &cpu->cycles);
+
+   cpu->pc = addr;
+   cpu->cycles++;
+}
+
+void rts(CPU* cpu, const RAM* ram) {
+   word addr = popWordFromStack(ram, &cpu->sp, &cpu->cycles);
+   cpu->pc = addr + 1; //Not sure if correct but this is the only way program flow does not break.
+   cpu->cycles++;
+}
+
+void adcImmediate(CPU* cpu, const RAM* ram) {
+   byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   word sum = cpu->a + val + cpu->c;
+   cpu->a = (byte)sum;
+   setADCFlags(cpu, sum, val);
+}
+
+void ldaImmediate(CPU* cpu, const RAM* ram) {
+   byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   cpu->a = val;
+   setLDAFlags(cpu);
+}
+
+void ldaZeroPage(CPU* cpu, const RAM* ram) {
+   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   cpu->a = readByteFromAddr(zpAddr, ram, &cpu->cycles);
+   setLDAFlags(cpu);
+}
+
+void ldaZeroPageX(CPU* cpu, const RAM* ram) {
+   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   zpAddr += cpu->x;
+   cpu->cycles++;
+
+   cpu->a = readByteFromAddr(zpAddr, ram, &cpu->cycles);
+   setLDAFlags(cpu);
+}
+
+void ldaAbsolute(CPU* cpu, const RAM* ram) {
+   word absAddr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+
+   cpu->a = readByteFromAddr(absAddr, ram, &cpu->cycles);
+   setLDAFlags(cpu);
+}
+
+void ldaAbsoluteX(CPU* cpu, const RAM* ram) {
+   word absAddr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+   word absAddrX = absAddr + cpu->x;
+   const bool crossed = (absAddr ^ absAddrX) >> 8;
+   if (crossed) {
+      cpu->cycles++;
+   }
+
+   cpu->a = readByteFromAddr(absAddrX, ram, &cpu->cycles);
+   setLDAFlags(cpu);
+}
+
+void ldaAbsoluteY(CPU* cpu, const RAM* ram) {
+   word absAddr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+   word absAddrY = absAddr + cpu->y;
+   const bool crossed = (absAddr ^ absAddrY) >> 8;
+   if (crossed) {
+      cpu->cycles++;
+   }
+
+   cpu->a = readByteFromAddr(absAddrY, ram, &cpu->cycles);
+   setLDAFlags(cpu);
+}
+
+void ldaIndirectX(CPU* cpu, const RAM* ram) {
+   byte addrZp = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   addrZp += cpu->x;
+   cpu->cycles++;
+   word addr = readWordFromAddr(addrZp, ram, &cpu->cycles);
+
+   cpu->a = readByteFromAddr(addr, ram, &cpu->cycles);
+   setLDAFlags(cpu);
+}
+
+void ldaIndirectY(CPU* cpu, const RAM* ram) {
+   byte addrZp = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   word addr = readWordFromAddr(addrZp, ram, &cpu->cycles);
+   word addrY = addr + cpu->y;
+   const bool crossed = (addr ^ addrY) >> 8;
+   if (crossed) {
+      cpu->cycles++;
+   }
+
+   cpu->a = readByteFromAddr(addrY, ram, &cpu->cycles);
+   setLDAFlags(cpu);
+}
+
+#pragma endregion
+
+void(*insTable[256])(CPU* cpu, RAM* ram) = {
+   [INS_JSR] = &jsr,
+   [INS_RTS] = &rts,
+   [INS_ADC_IM] = &adcImmediate,
+   [INS_LDA_IM] = &ldaImmediate,
+   [INS_LDA_ZP] = &ldaZeroPage,
+   [INS_LDA_ZPX] = &ldaZeroPageX,
+   [INS_LDA_ABS] = &ldaAbsolute,
+   [INS_LDA_ABSX] = &ldaAbsoluteX,
+   [INS_LDA_ABSY] = &ldaAbsoluteY,
+   [INS_LDA_INDX] = &ldaIndirectX,
+   [INS_LDA_INDY] = &ldaIndirectY,
+};
 
 RAM* initRAM() {
    RAM* ram = malloc(sizeof(RAM));
@@ -105,7 +227,6 @@ RAM* initRAM() {
    printf("DEBUG\t| Allocated [%llu B] to RAM\n", MEM_MAX * sizeof(byte));
 #endif // _DEBUG
 
-
    return ram;
 }
 
@@ -113,6 +234,7 @@ RAM* initRAM() {
 void freeRAM(RAM* ram) {
    free(ram->data);
    free(ram);
+
 #ifdef _DEBUG
    printf("DEBUG\t| Freed allocated memory\n");
 #endif //_DEBUG
@@ -134,100 +256,19 @@ void resetCPU(CPU* cpu, word sPC) {
    cpu->x = 0;
    cpu->y = 0;
 
+   cpu->cycles = 0;
+
 #ifdef _DEBUG
    printf("DEBUG\t| Reset CPU\n");
 #endif // _DEBUG
-
 }
 
-void exec(CPU* cpu, RAM* ram, u32 cycles) {
-   while (cycles > 0) {
-      byte nextIns = readByteFromPC(&cpu->pc, ram, &cycles);
-#ifdef _DEBUG
-      printf("DEBUG\t| Instruction: 0x%X\n", nextIns);
-#endif //_DEBUG
-      switch (nextIns) {
-      case INS_JSR: {
-         word addr = readWordFromPC(&cpu->pc, ram, &cycles);
-         pushWordToStack(ram, &cpu->sp, cpu->pc - 1, &cycles);
-
-         cpu->pc = addr;
-         cycles--;
-      } break;
-      case INS_RTS: {
-         word addr = popWordFromStack(ram, &cpu->sp, &cycles);
-         cpu->pc = addr;
-         cycles--;
-      } break;
-      case INS_LDA_IM: {
-         byte val = readByteFromPC(&cpu->pc, ram, &cycles);
-         cpu->a = val;
-         setLDAFlags(cpu);
-      } break;
-      case INS_LDA_ZP: {
-         byte zpAddr = readByteFromPC(&cpu->pc, ram, &cycles);
-         cpu->a = readByteFromAddr(zpAddr, ram, &cycles);
-         setLDAFlags(cpu);
-      } break;
-      case INS_LDA_ZPX: {
-         byte zpAddr = readByteFromPC(&cpu->pc, ram, &cycles);
-         zpAddr += cpu->x;
-         cycles--;
-         cpu->a = readByteFromAddr(zpAddr, ram, &cycles);
-         setLDAFlags(cpu);
-      } break;
-      case INS_LDA_ABS: {
-         word absAddr = readWordFromPC(&cpu->pc, ram, &cycles);
-
-         cpu->a = readByteFromAddr(absAddr, ram, &cycles);
-         setLDAFlags(cpu);
-      } break;
-      case INS_LDA_ABSX: {
-         word absAddr = readWordFromPC(&cpu->pc, ram, &cycles);
-         word absAddrX = absAddr + cpu->x;
-         const bool crossed = (absAddr ^ absAddrX) >> 8;
-         if (crossed) {
-            cycles--;
-         }
-
-         cpu->a = readByteFromAddr(absAddrX, ram, &cycles);
-         setLDAFlags(cpu);
-      } break;
-      case INS_LDA_ABSY: {
-         word absAddr = readWordFromPC(&cpu->pc, ram, &cycles);
-         word absAddrY = absAddr + cpu->y;
-         const bool crossed = (absAddr ^ absAddrY) >> 8;
-         if (crossed) {
-            cycles--;
-         }
-
-         cpu->a = readByteFromAddr(absAddrY, ram, &cycles);
-         setLDAFlags(cpu);
-      } break;
-      case INS_LDA_INDX: {
-         byte addrZp = readByteFromPC(&cpu->pc, ram, &cycles);
-         addrZp += cpu->x;
-         cycles--;
-         word addr = readWordFromAddr(addrZp, ram, &cycles);
-         
-         cpu->a = readByteFromAddr(addr, ram, &cycles);
-         setLDAFlags(cpu);
-      } break;
-      case INS_LDA_INDY: {
-         byte addrZp = readByteFromPC(&cpu->pc, ram, &cycles);
-         word addr = readWordFromAddr(addrZp, ram, &cycles);
-         word addrY = addr + cpu->y;
-         const bool crossed = (addr ^ addrY) >> 8;
-         if (crossed) {
-            cycles--;
-         }
-
-         cpu->a = readByteFromAddr(addrY, ram, &cycles);
-         setLDAFlags(cpu);
-      } break;
-      default: {
-         printf("Unsupported instruction: %d\n", nextIns);
-      }
+void exec(CPU* cpu, RAM* ram, u32 insCount) {
+   for (u32 i = insCount; i > 0; i--) {
+      byte opCode = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+      
+      if (NULL != insTable[opCode]) {
+         insTable[opCode](cpu, ram);
       }
    }
 }
