@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "cpu.h"
 
+#define TEST_COUNT 17
 #define ASSERT_EQUAL(exp, got, argName) \
    do { \
       if ((exp) != (got)) { \
@@ -17,16 +18,6 @@
 #define PRINT_TEST_NAME() \
    printf("\n### %s ###\n", __func__)
 
-void testResetCPU();
-void testLDAImmediate();
-void testLDAZeroPage();
-void testLDAZeroPageX();
-void testLDAAbsolute();
-void testLDAAbsoluteX();
-void testLDAAbsoluteY();
-void testLDAIndirectX();
-void testLDAIndirectY();
-void testJSR();
-void testRTS();
+void runTests();
 
 #endif // !TEST_H

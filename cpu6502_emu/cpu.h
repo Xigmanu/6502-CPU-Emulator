@@ -27,6 +27,13 @@
 #define INS_LDA_INDX 0xA1  //LDA Indirect X. Takes 6 cycles.
 #define INS_LDA_INDY 0xB1  //LDA Indirect Y. Takes 5(+1) cycles.
 #pragma endregion
+#pragma region LDX
+#define INS_LDX_IM 0xA2    //LDX immediate. Takes 2 cycles.
+#define INS_LDX_ZP 0xA6    //LDX Zero page. Takes 3 cycles.
+#define INS_LDX_ZPY 0xB6   //LDX Zero page X. Takes 4 cycles.
+#define INS_LDX_ABS 0xAE   //LDX Absolute. Takes 4 cycles.
+#define INS_LDX_ABSY 0xBE  //LDX Absolute Y. Takes 4(+1) cycles
+#pragma endregion
 
 typedef unsigned char byte;
 typedef unsigned short word;
@@ -62,6 +69,6 @@ typedef struct CPU CPU;
 void resetCPU(CPU* cpu, word sPC);
 RAM* initRAM();
 void freeRAM(RAM* ram);
-void exec(CPU* cpu, RAM* ram, u32 cycles);
+int exec(CPU* cpu, RAM* ram, u32 insCount);
 
 #endif // !CPU_H
