@@ -77,6 +77,8 @@ void testLDAImmediate(void) {
    ASSERT_EQUAL(0x42, cpu.a, "A");
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -95,6 +97,8 @@ void testLDAZeroPage(void) {
    ASSERT_EQUAL(0x24, cpu.a, "A");
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(3, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -114,6 +118,8 @@ void testLDAZeroPageX(void) {
    ASSERT_EQUAL(0x70, cpu.a, "A");
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -133,6 +139,8 @@ void testLDAAbsolute(void) {
    ASSERT_EQUAL(0x15, cpu.a, "A");
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -152,6 +160,8 @@ void testLDAAbsoluteX(void) {
    ASSERT_EQUAL(0x15, cpu.a, "A");
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -171,6 +181,8 @@ void testLDAAbsoluteY(void) {
    ASSERT_EQUAL(0x15, cpu.a, "A");
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -191,6 +203,8 @@ void testLDAIndirectX(void) {
    ASSERT_EQUAL(0x51, cpu.a, "A");
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(6, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -212,6 +226,8 @@ void testLDAIndirectY(void) {
    ASSERT_EQUAL(0x51, cpu.a, "A");
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(5, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -229,6 +245,8 @@ void testLDXImmediate(void) {
    ASSERT_EQUAL(0x42, cpu.x, "X");
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -246,6 +264,8 @@ void testLDXZeroPage(void) {
    ASSERT_EQUAL(0x24, cpu.x, "X");
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(3, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -264,6 +284,8 @@ void testLDXZeroPageY(void) {
    ASSERT_EQUAL(0x24, cpu.x, "X");
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -282,9 +304,12 @@ void testLDXAbsolute(void) {
    ASSERT_EQUAL(0x15, cpu.x, "X");
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
+
 void testLDXAbsoluteY(void) {
    PRINT_TEST_NAME();
    CPU cpu;
@@ -301,6 +326,111 @@ void testLDXAbsoluteY(void) {
    ASSERT_EQUAL(0x15, cpu.x, "X");
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+
+   freeRAM(ram);
+}
+
+void testLDYImmediate(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+   
+   ram->data[0xFFFC] = INS_LDY_IM;
+   ram->data[0xFFFD] = 0x42;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x42, cpu.y, "Y");
+   ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
+   ASSERT_EQUAL(2, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+
+   freeRAM(ram);
+}
+
+void testLDYZeroPage(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   ram->data[0xFFFC] = INS_LDY_ZP;
+   ram->data[0xFFFD] = 0x42;
+   ram->data[0x42] = 0x24;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x24, cpu.y, "Y");
+   ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
+   ASSERT_EQUAL(3, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+  
+   freeRAM(ram);
+}
+
+void testLDYZeroPageX(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.x = 0x10;
+   ram->data[0xFFFC] = INS_LDY_ZPX;
+   ram->data[0xFFFD] = 0x42;
+   ram->data[0x52] = 0x24;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x24, cpu.y, "Y");
+   ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
+   ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+
+   freeRAM(ram);
+}
+
+void testLDYAbsolute(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   ram->data[0xFFFC] = INS_LDY_ABS;
+   ram->data[0xFFFD] = 0x42;
+   ram->data[0xFFFE] = 0x12;
+   ram->data[0x1242] = 0x15;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x15, cpu.y, "Y");
+   ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
+   ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+
+   freeRAM(ram);
+}
+
+void testLDYAbsoluteX(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.x = 0x10;
+   ram->data[0xFFFC] = INS_LDY_ABSX;
+   ram->data[0xFFFD] = 0x42;
+   ram->data[0xFFFE] = 0x12;
+   ram->data[0x1252] = 0x15;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x15, cpu.y, "Y");
+   ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
+   ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
@@ -322,11 +452,13 @@ void testADCImmediate(void) {
    ASSERT_EQUAL(0xA6, cpu.a, "A");
    ASSERT_EQUAL(0xFFF9, cpu.pc, "PC");
    ASSERT_EQUAL(6, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
 }
 
-void(*tests[20])(void) = {
+void(*tests[30])(void) = {
    [0] = &testResetCPU,
    [1] = &testJSR,
    [2] = &testRTS,
@@ -343,6 +475,11 @@ void(*tests[20])(void) = {
    [13] = &testLDAZeroPageX,
    [14] = &testLDXAbsolute,
    [15] = &testLDXAbsoluteY,
+   [16] = &testLDYImmediate,
+   [17] = &testLDYZeroPage,
+   [18] = &testLDYZeroPageX,
+   [19] = &testLDYAbsolute,
+   [20] = &testLDYAbsoluteX,
 };
 
 void runTests() {

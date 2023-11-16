@@ -79,17 +79,17 @@ word popWordFromStack(const RAM* ram, byte* sp, u32* cycles) {
 #pragma endregion
 
 #pragma region Instruction helpers
-
-void setLDFlags(CPU* cpu) {
-   cpu->z = (cpu->a == 0);
-   cpu->n = (cpu->a & 0x80) > 0;
+//Improve
+void setLDFlags(CPU* cpu, byte reg) {
+   cpu->z = (reg == 0);
+   cpu->n = (reg & 0x80) > 0;
 #ifdef _DEBUG
    printf("DEBUG\t| Set Flags: Z: [0x%X], N: [0x%X]\n", cpu->z, cpu->n);
 #endif // _DEBUG
 }
 
 void setADCFlags(CPU* cpu, word sum, byte op) {
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->a);
    cpu->c = sum > 0xFF;
    cpu->v = ((cpu->a ^ op) & 0x80) && ((cpu->a ^ sum) & 0x80);
 #ifdef _DEBUG
@@ -153,32 +153,32 @@ void adcImmediate(CPU* cpu, const RAM* ram) {
 void ldaImmediate(CPU* cpu, const RAM* ram) {
    byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
    cpu->a = val;
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->a);
 }
 
 void ldaZeroPage(CPU* cpu, const RAM* ram) {
    cpu->a = zPHelper(&cpu->pc, ram, &cpu->cycles);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->a);
 }
 
 void ldaZeroPageX(CPU* cpu, const RAM* ram) {
    cpu->a = zPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->a);
 }
 
 void ldaAbsolute(CPU* cpu, const RAM* ram) {
    cpu->a = absHelper(&cpu->pc, ram, &cpu->cycles);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->a);
 }
 
 void ldaAbsoluteX(CPU* cpu, const RAM* ram) {
    cpu->a = absRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->a);
 }
 
 void ldaAbsoluteY(CPU* cpu, const RAM* ram) {
    cpu->a = absRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->a);
 }
 
 
@@ -189,7 +189,7 @@ void ldaIndirectX(CPU* cpu, const RAM* ram) {
    word addr = readWordFromAddr(addrZp, ram, &cpu->cycles);
 
    cpu->a = readByteFromAddr(addr, ram, &cpu->cycles);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->a);
 }
 
 void ldaIndirectY(CPU* cpu, const RAM* ram) {
@@ -201,33 +201,59 @@ void ldaIndirectY(CPU* cpu, const RAM* ram) {
    }
 
    cpu->a = readByteFromAddr(addrY, ram, &cpu->cycles);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->a);
 }
 
 void ldxImmediate(CPU* cpu, const RAM* ram) {
    byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
    cpu->x = val;
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->x);
 }
 
 void ldxZeroPage(CPU* cpu, const RAM* ram) {
    cpu->x = zPHelper(&cpu->pc, ram, &cpu->cycles);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->x);
 }
 
 void ldxZeroPageY(CPU* cpu, const RAM* ram) {
    cpu->x = zPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->x);
 }
 
 void ldxAbsolute(CPU* cpu, const RAM* ram) {
    cpu->x = absHelper(&cpu->pc, ram, &cpu->cycles);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->x);
 }
 
 void ldxAbsoluteY(CPU* cpu, const RAM* ram) {
    cpu->x = absRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
-   setLDFlags(cpu);
+   setLDFlags(cpu, cpu->x);
+}
+
+void ldyImmediate(CPU* cpu, const RAM* ram) {
+   byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   cpu->y = val;
+   setLDFlags(cpu, cpu->y);
+}
+
+void ldyZeroPage(CPU* cpu, const RAM* ram) {
+   cpu->y = zPHelper(&cpu->pc, ram, &cpu->cycles);
+   setLDFlags(cpu, cpu->y);
+}
+
+void ldyZeroPageX(CPU* cpu, const RAM* ram) {
+   cpu->y = zPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
+   setLDFlags(cpu, cpu->y);
+}
+
+void ldyAbsolute(CPU* cpu, const RAM* ram) {
+   cpu->y = absHelper(&cpu->pc, ram, &cpu->cycles);
+   setLDFlags(cpu, cpu->y);
+}
+
+void ldyAbsoluteX(CPU* cpu, const RAM* ram) {
+   cpu->x = absRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
+   setLDFlags(cpu, cpu->y);
 }
 
 #pragma endregion
@@ -250,6 +276,11 @@ void(*insTable[256])(CPU* cpu, RAM* ram) = {
    [INS_LDX_ZPY] = &ldxZeroPageY,
    [INS_LDX_ABS] = &ldxAbsolute,
    [INS_LDX_ABSY] = &ldxAbsoluteY,
+   [INS_LDY_IM] = &ldyImmediate,
+   [INS_LDY_ZP] = &ldyZeroPage,
+   [INS_LDY_ZPX] = &ldyZeroPageX,
+   [INS_LDY_ABS] = &ldyAbsolute,
+   [INS_LDY_ABSX] = &ldyAbsoluteX,
 };
 
 RAM* initRAM() {

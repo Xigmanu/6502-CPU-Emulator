@@ -30,10 +30,18 @@
 #pragma region LDX
 #define INS_LDX_IM 0xA2    //LDX immediate. Takes 2 cycles.
 #define INS_LDX_ZP 0xA6    //LDX Zero page. Takes 3 cycles.
-#define INS_LDX_ZPY 0xB6   //LDX Zero page X. Takes 4 cycles.
+#define INS_LDX_ZPY 0xB6   //LDX Zero page Y. Takes 4 cycles.
 #define INS_LDX_ABS 0xAE   //LDX Absolute. Takes 4 cycles.
-#define INS_LDX_ABSY 0xBE  //LDX Absolute Y. Takes 4(+1) cycles
+#define INS_LDX_ABSY 0xBE  //LDX Absolute Y. Takes 4(+1) cycles   
 #pragma endregion
+#pragma region LDY
+#define INS_LDY_IM 0xA0    //LDY immediate. Takes 2 cycles.
+#define INS_LDY_ZP 0xA4    //LDY Zero page. Takes 3 cycles.
+#define INS_LDY_ZPX 0xB4   //LDY Zero page X. Takes 4 cycles.
+#define INS_LDY_ABS 0xAC   //LDY Absolute. Takes 4 cycles.
+#define INS_LDY_ABSX 0xBC  //LDY Absolute X. Takes 4(+1) cycles 
+#pragma endregion
+
 
 typedef unsigned char byte;
 typedef unsigned short word;
