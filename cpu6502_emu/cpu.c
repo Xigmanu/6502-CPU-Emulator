@@ -7,7 +7,7 @@
 byte readByteFromPC(word* pc, const RAM* ram, u32* cycles) {
    byte val = ram->data[*pc];
 #ifdef _DEBUG
-   printf("DEBUG\t| Read byte [0x%X] from RAM. PC: [0x%X]\n", val, *pc);
+   printf("DEBUG\t| Read [0x%X] from [0x%X]\n", val, *pc);
 #endif //_DEBUG
    (*pc)++;
    (*cycles)++;
@@ -20,7 +20,7 @@ byte readByteFromAddr(word addr, const RAM* ram, u32* cycles) {
    (*cycles)++;
 
 #ifdef _DEBUG
-   printf("DEBUG\t| Read byte [0x%X] from RAM. ADDR: [0x%X]\n", val, addr);
+   printf("DEBUG\t| Read [0x%X] from [0x%X]\n", val, addr);
 #endif //_DEBUG
 
    return val;
@@ -42,10 +42,18 @@ word readWordFromAddr(word addr, const RAM* ram, u32* cycles) {
    byte hiB = readByteFromAddr(addr + 1, ram, cycles);
 
 #ifdef _DEBUG
-   printf("DEBUG\t| Read word from [0x%X+0x%X]. loB=[0x%X], hiB=[0x%X]\n", addr, addr + 1, loB, hiB);
+   printf("DEBUG\t| Read word. loB=[0x%X], hiB=[0x%X]\n", loB, hiB);
 #endif // _DEBUG
 
    return (word)(loB | (hiB << 8));
+}
+
+void writeByteToMemory(byte val, word addr, RAM* ram, u32* cycles) {
+   ram->data[addr] = val;
+   (*cycles)++;
+#ifdef _DEBUG
+   printf("DEBUG\t| Wrote [0x%X] to [0x%X]\n", val, addr);
+#endif // _DEBUG
 }
 
 void pushWordToStack(RAM* ram, byte* sp, word val, u32* cycles) {
@@ -97,12 +105,12 @@ void setADCFlags(CPU* cpu, word sum, byte op) {
 #endif // _DEBUG
 }
 
-byte zPHelper(word* pc, const RAM* ram, u32* cycles) {
+byte ldZPHelper(word* pc, const RAM* ram, u32* cycles) {
    byte zpAddr = readByteFromPC(pc, ram, cycles);
    return readByteFromAddr(zpAddr, ram, cycles);
 }
 
-byte zPRegHelper(word* pc, const RAM* ram, u32* cycles, byte reg) {
+byte ldZPRegHelper(word* pc, const RAM* ram, u32* cycles, byte reg) {
    byte zpAddr = readByteFromPC(pc, ram, cycles);
    zpAddr += reg;
    (*cycles)++;
@@ -110,12 +118,12 @@ byte zPRegHelper(word* pc, const RAM* ram, u32* cycles, byte reg) {
    return readByteFromAddr(zpAddr, ram, cycles);
 }
 
-byte absHelper(word* pc, const RAM* ram, u32* cycles) {
+byte ldAbsHelper(word* pc, const RAM* ram, u32* cycles) {
    word absAddr = readWordFromPC(pc, ram, cycles);
    return readByteFromAddr(absAddr, ram, cycles);
 }
 
-byte absRegHelper(word* pc, const RAM* ram, u32* cycles, byte reg) {
+byte ldAbsRegHelper(word* pc, const RAM* ram, u32* cycles, byte reg) {
    word absAddr = readWordFromPC(pc, ram, cycles);
    word absAddrReg = absAddr + reg;
    if ((absAddr & 0xFF00) != (absAddrReg & 0xFF00)) {
@@ -157,27 +165,27 @@ void ldaImmediate(CPU* cpu, const RAM* ram) {
 }
 
 void ldaZeroPage(CPU* cpu, const RAM* ram) {
-   cpu->a = zPHelper(&cpu->pc, ram, &cpu->cycles);
+   cpu->a = ldZPHelper(&cpu->pc, ram, &cpu->cycles);
    setLDFlags(cpu, cpu->a);
 }
 
 void ldaZeroPageX(CPU* cpu, const RAM* ram) {
-   cpu->a = zPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
+   cpu->a = ldZPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
    setLDFlags(cpu, cpu->a);
 }
 
 void ldaAbsolute(CPU* cpu, const RAM* ram) {
-   cpu->a = absHelper(&cpu->pc, ram, &cpu->cycles);
+   cpu->a = ldAbsHelper(&cpu->pc, ram, &cpu->cycles);
    setLDFlags(cpu, cpu->a);
 }
 
 void ldaAbsoluteX(CPU* cpu, const RAM* ram) {
-   cpu->a = absRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
+   cpu->a = ldAbsRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
    setLDFlags(cpu, cpu->a);
 }
 
 void ldaAbsoluteY(CPU* cpu, const RAM* ram) {
-   cpu->a = absRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
+   cpu->a = ldAbsRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
    setLDFlags(cpu, cpu->a);
 }
 
@@ -211,22 +219,22 @@ void ldxImmediate(CPU* cpu, const RAM* ram) {
 }
 
 void ldxZeroPage(CPU* cpu, const RAM* ram) {
-   cpu->x = zPHelper(&cpu->pc, ram, &cpu->cycles);
+   cpu->x = ldZPHelper(&cpu->pc, ram, &cpu->cycles);
    setLDFlags(cpu, cpu->x);
 }
 
 void ldxZeroPageY(CPU* cpu, const RAM* ram) {
-   cpu->x = zPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
+   cpu->x = ldZPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
    setLDFlags(cpu, cpu->x);
 }
 
 void ldxAbsolute(CPU* cpu, const RAM* ram) {
-   cpu->x = absHelper(&cpu->pc, ram, &cpu->cycles);
+   cpu->x = ldAbsHelper(&cpu->pc, ram, &cpu->cycles);
    setLDFlags(cpu, cpu->x);
 }
 
 void ldxAbsoluteY(CPU* cpu, const RAM* ram) {
-   cpu->x = absRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
+   cpu->x = ldAbsRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
    setLDFlags(cpu, cpu->x);
 }
 
@@ -237,23 +245,72 @@ void ldyImmediate(CPU* cpu, const RAM* ram) {
 }
 
 void ldyZeroPage(CPU* cpu, const RAM* ram) {
-   cpu->y = zPHelper(&cpu->pc, ram, &cpu->cycles);
+   cpu->y = ldZPHelper(&cpu->pc, ram, &cpu->cycles);
    setLDFlags(cpu, cpu->y);
 }
 
 void ldyZeroPageX(CPU* cpu, const RAM* ram) {
-   cpu->y = zPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
+   cpu->y = ldZPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
    setLDFlags(cpu, cpu->y);
 }
 
 void ldyAbsolute(CPU* cpu, const RAM* ram) {
-   cpu->y = absHelper(&cpu->pc, ram, &cpu->cycles);
+   cpu->y = ldAbsHelper(&cpu->pc, ram, &cpu->cycles);
    setLDFlags(cpu, cpu->y);
 }
 
 void ldyAbsoluteX(CPU* cpu, const RAM* ram) {
-   cpu->x = absRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
+   cpu->y = ldAbsRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
    setLDFlags(cpu, cpu->y);
+}
+
+void staZeroPage(CPU* cpu, RAM* ram) {
+   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   writeByteToMemory(cpu->a, zpAddr, ram, &cpu->cycles);
+}
+
+void staZeroPageX(CPU* cpu, RAM* ram) {
+   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   byte effAddr = (zpAddr + cpu->x) & 0xFF;
+   cpu->cycles++;
+   writeByteToMemory(cpu->a, effAddr, ram, &cpu->cycles);
+}
+
+void staAbsolute(CPU* cpu, RAM* ram) {
+   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+   writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
+}
+
+void staAbsoluteX(CPU* cpu, RAM* ram) {
+   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+   word addrX = addr + cpu->x;
+   if ((addrX & 0xFF00) != (addr & 0xFF)) {
+      cpu->cycles++;
+   }
+   writeByteToMemory(cpu->a, addrX, ram, &cpu->cycles);
+}
+
+void staAbsoluteY(CPU* cpu, RAM* ram) {
+   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+   word effAddr = addr + cpu->y;
+   if ((addr & 0xFF00) != (addr & 0xFF)) {
+      cpu->cycles++;
+   }
+   writeByteToMemory(cpu->a, effAddr, ram, &cpu->cycles);
+}
+
+void staIndirectX(CPU* cpu, RAM* ram) {
+   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   zpAddr += cpu->x;
+   word effAddr = readWordFromAddr(zpAddr, ram, &cpu->cycles);
+   writeByteToMemory(cpu->a, effAddr, ram, &cpu->cycles);
+}
+
+void staIndirectY(CPU* cpu, RAM* ram) {
+   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   word addr = readWordFromAddr(zpAddr, ram, &cpu->cycles);
+   addr += cpu->y;
+   writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
 }
 
 #pragma endregion
@@ -281,6 +338,13 @@ void(*insTable[256])(CPU* cpu, RAM* ram) = {
    [INS_LDY_ZPX] = &ldyZeroPageX,
    [INS_LDY_ABS] = &ldyAbsolute,
    [INS_LDY_ABSX] = &ldyAbsoluteX,
+   [INS_STA_ZP] = &staZeroPage,
+   [INS_STA_ZPX] = &staZeroPageX,
+   [INS_STA_ABS] = &staAbsolute,
+   [INS_STA_ABSX] = &staAbsoluteX,
+   [INS_STA_ABSY] = &staAbsoluteY,
+   [INS_STA_INDX] = &staIndirectX,
+   [INS_STA_INDY] = &staIndirectY,
 };
 
 RAM* initRAM() {
@@ -298,7 +362,7 @@ RAM* initRAM() {
    }
 
 #ifdef _DEBUG
-   printf("DEBUG\t| Allocated [%llu B] to RAM\n", MEM_MAX * sizeof(byte));
+   printf("DEBUG\t| Initialized RAM\n");
 #endif // _DEBUG
 
    return ram;

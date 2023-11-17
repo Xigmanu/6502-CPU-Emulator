@@ -435,6 +435,144 @@ void testLDYAbsoluteX(void) {
    freeRAM(ram);
 }
 
+void testSTAZeroPage(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.a = 0x42;
+   ram->data[0xFFFC] = INS_STA_ZP;
+   ram->data[0xFFFD] = 0x54;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x42, ram->data[0x54], "MEM");
+   ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
+   ASSERT_EQUAL(3, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+void testSTAZeroPageX(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.a = 0x42;
+   cpu.x = 0x24;
+   ram->data[0xFFFC] = INS_STA_ZPX;
+   ram->data[0xFFFD] = 0x54;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x42, ram->data[0x78], "MEM");
+   ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
+   ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+void testSTAAbsolute(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.a = 0x42;
+   ram->data[0xFFFC] = INS_STA_ABS;
+   ram->data[0xFFFD] = 0x33;
+   ram->data[0xFFFE] = 0x22;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x42, ram->data[0x2233], "MEM");
+   ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
+   ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+   
+   freeRAM(ram);
+}
+
+void testSTAAbsoluteX(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.a = 0x42;
+   cpu.x = 0x10;
+   ram->data[0xFFFC] = INS_STA_ABSX;
+   ram->data[0xFFFD] = 0x33;
+   ram->data[0xFFFE] = 0x22;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x42, ram->data[0x2243], "MEM");
+   ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
+   ASSERT_EQUAL(5, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+void testSTAAbsoluteY(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.a = 0x42;
+   cpu.y = 0x10;
+   ram->data[0xFFFC] = INS_STA_ABSY;
+   ram->data[0xFFFD] = 0x33;
+   ram->data[0xFFFE] = 0x22;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x42, ram->data[0x2243], "MEM");
+   ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
+   ASSERT_EQUAL(5, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+void testSTAIndirectX(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.a = 0x42;
+   cpu.x = 0x10;
+   ram->data[0xFFFC] = INS_STA_INDX;
+   ram->data[0xFFFD] = 0x24;
+   ram->data[0x34] = 0x40;
+   ram->data[0x35] = 0x89;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x42, ram->data[0x8940], "MEM");
+   ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
+   ASSERT_EQUAL(6, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+void testSTAIndirectY(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.a = 0x42;
+   cpu.y = 0x10;
+   ram->data[0xFFFC] = INS_STA_INDY;
+   ram->data[0xFFFD] = 0x12;
+   ram->data[0x12] = 0x14;
+   ram->data[0x13] = 0xD2;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x42, ram->data[0xD224], "MEM");
+   ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
+   ASSERT_EQUAL(6, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
 void testADCImmediate(void) {
    PRINT_TEST_NAME();
    CPU cpu;
@@ -480,6 +618,13 @@ void(*tests[30])(void) = {
    [18] = &testLDYZeroPageX,
    [19] = &testLDYAbsolute,
    [20] = &testLDYAbsoluteX,
+   [21] = &testSTAZeroPage,
+   [22] = &testSTAZeroPageX,
+   [23] = &testSTAAbsolute,
+   [24] = &testSTAAbsoluteX,
+   [25] = &testSTAAbsoluteY,
+   [26] = &testSTAIndirectX,
+   [27] = &testSTAIndirectY,
 };
 
 void runTests() {

@@ -17,8 +17,8 @@
 #define INS_ADC_INDX 0xA1  //ADC Indirect X. Takes 6 cycles.
 #define INS_ADC_INDY 0xB1  //ADC Indirect Y. Takes 5(+1) cycles.
 #pragma endregion
-#pragma region LDA
-#define INS_LDA_IM 0xA9    //LDA immediate. Takes 2 cycles.
+#pragma region LD_OPCODES
+#define INS_LDA_IM 0xA9    //LDA Immediate. Takes 2 cycles.
 #define INS_LDA_ZP 0xA5    //LDA Zero page. Takes 3 cycles.
 #define INS_LDA_ZPX 0xB5   //LDA Zero page X. Takes 4 cycles.
 #define INS_LDA_ABS 0xAD   //LDA Absolute. Takes 4 cycles.
@@ -26,22 +26,27 @@
 #define INS_LDA_ABSY 0xB9  //LDA Absolute Y. Takes 4(+1) cycles
 #define INS_LDA_INDX 0xA1  //LDA Indirect X. Takes 6 cycles.
 #define INS_LDA_INDY 0xB1  //LDA Indirect Y. Takes 5(+1) cycles.
-#pragma endregion
-#pragma region LDX
-#define INS_LDX_IM 0xA2    //LDX immediate. Takes 2 cycles.
+
+#define INS_LDX_IM 0xA2    //LDX Immediate. Takes 2 cycles.
 #define INS_LDX_ZP 0xA6    //LDX Zero page. Takes 3 cycles.
 #define INS_LDX_ZPY 0xB6   //LDX Zero page Y. Takes 4 cycles.
 #define INS_LDX_ABS 0xAE   //LDX Absolute. Takes 4 cycles.
 #define INS_LDX_ABSY 0xBE  //LDX Absolute Y. Takes 4(+1) cycles   
-#pragma endregion
-#pragma region LDY
-#define INS_LDY_IM 0xA0    //LDY immediate. Takes 2 cycles.
+
+#define INS_LDY_IM 0xA0    //LDY Immediate. Takes 2 cycles.
 #define INS_LDY_ZP 0xA4    //LDY Zero page. Takes 3 cycles.
 #define INS_LDY_ZPX 0xB4   //LDY Zero page X. Takes 4 cycles.
 #define INS_LDY_ABS 0xAC   //LDY Absolute. Takes 4 cycles.
 #define INS_LDY_ABSX 0xBC  //LDY Absolute X. Takes 4(+1) cycles 
-#pragma endregion
 
+#define INS_STA_ZP 0x85    //STA Zero page. Takes 3 cycles.
+#define INS_STA_ZPX 0x95   //STA Zero page X. Takes 4 cycles.
+#define INS_STA_ABS 0x8D   //STA Absolute. Takes 4 cycles.
+#define INS_STA_ABSX 0x9D  //STA Absolute X. Takes 5 cycles.
+#define INS_STA_ABSY 0x99  //STA Absolute Y. Takes 5 cycles.
+#define INS_STA_INDX 0x81  //STA Indirect X. Takes 6 cycles.
+#define INS_STA_INDY 0x91  //STA Indirect Y. Takes 6 cycles.
+#pragma endregion
 
 typedef unsigned char byte;
 typedef unsigned short word;
