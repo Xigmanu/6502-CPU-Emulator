@@ -46,6 +46,15 @@
 #define INS_STA_ABSY 0x99  //STA Absolute Y. Takes 5 cycles.
 #define INS_STA_INDX 0x81  //STA Indirect X. Takes 6 cycles.
 #define INS_STA_INDY 0x91  //STA Indirect Y. Takes 6 cycles.
+
+#define INS_STX_ZP 0x86    //STX Zero page. Takes 3 cycles.
+#define INS_STX_ZPY 0x96   //STX Zero page Y. Takes 4 cycles.
+#define INS_STX_ABS 0x8E   //STX Absolute. Takes 4 cycles.
+
+#define INS_STY_ZP 0x84    //STY Zero page. Takes 3 cycles.
+#define INS_STY_ZPX 0x94   //STY Zero page Y. Takes 4 cycles.
+#define INS_STY_ABS 0x8C   //STY Absolute. Takes 4 cycles.
+
 #pragma endregion
 
 typedef unsigned char byte;

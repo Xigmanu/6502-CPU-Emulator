@@ -302,6 +302,7 @@ void staAbsoluteY(CPU* cpu, RAM* ram) {
 void staIndirectX(CPU* cpu, RAM* ram) {
    byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
    zpAddr += cpu->x;
+   cpu->cycles++;
    word effAddr = readWordFromAddr(zpAddr, ram, &cpu->cycles);
    writeByteToMemory(cpu->a, effAddr, ram, &cpu->cycles);
 }
@@ -311,6 +312,40 @@ void staIndirectY(CPU* cpu, RAM* ram) {
    word addr = readWordFromAddr(zpAddr, ram, &cpu->cycles);
    addr += cpu->y;
    writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
+}
+
+void stxZeroPage(CPU* cpu, RAM* ram) {
+   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   writeByteToMemory(cpu->x, zpAddr, ram, &cpu->cycles);
+}
+
+void stxZeroPageY(CPU* cpu, RAM* ram) {
+   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   zpAddr += cpu->y;
+   cpu->cycles++;
+   writeByteToMemory(cpu->x, zpAddr, ram, &cpu->cycles);
+}
+
+void stxAbsolute(CPU* cpu, RAM* ram) {
+   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+   writeByteToMemory(cpu->x, addr, ram, &cpu->cycles);
+}
+
+void styZeroPage(CPU* cpu, RAM* ram) {
+   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   writeByteToMemory(cpu->y, zpAddr, ram, &cpu->cycles);
+}
+
+void styZeroPageX(CPU* cpu, RAM* ram) {
+   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   zpAddr += cpu->x;
+   cpu->cycles++;
+   writeByteToMemory(cpu->y, zpAddr, ram, &cpu->cycles);
+}
+
+void styAbsolute(CPU* cpu, RAM* ram) {
+   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+   writeByteToMemory(cpu->y, addr, ram, &cpu->cycles);
 }
 
 #pragma endregion
@@ -345,6 +380,12 @@ void(*insTable[256])(CPU* cpu, RAM* ram) = {
    [INS_STA_ABSY] = &staAbsoluteY,
    [INS_STA_INDX] = &staIndirectX,
    [INS_STA_INDY] = &staIndirectY,
+   [INS_STX_ZP] = &stxZeroPage,
+   [INS_STX_ZPY] = &stxZeroPageY,
+   [INS_STX_ABS] = &stxAbsolute,
+   [INS_STY_ZP] = &styZeroPage,
+   [INS_STY_ZPX] = &styZeroPageX,
+   [INS_STY_ABS] = &styAbsolute,
 };
 
 RAM* initRAM() {
