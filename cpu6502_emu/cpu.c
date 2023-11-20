@@ -87,8 +87,8 @@ word popWordFromStack(const RAM* ram, byte* sp, u32* cycles) {
 #pragma endregion
 
 #pragma region Instruction helpers
-//Improve
-void setLDFlags(CPU* cpu, byte reg) {
+
+void setZNFlags(CPU* cpu, byte reg) {
    cpu->z = (reg == 0);
    cpu->n = (reg & 0x80) > 0;
 #ifdef _DEBUG
@@ -97,7 +97,7 @@ void setLDFlags(CPU* cpu, byte reg) {
 }
 
 void setADCFlags(CPU* cpu, word sum, byte op) {
-   setLDFlags(cpu, cpu->a);
+   setZNFlags(cpu, cpu->a);
    cpu->c = sum > 0xFF;
    cpu->v = ((cpu->a ^ op) & 0x80) && ((cpu->a ^ sum) & 0x80);
 #ifdef _DEBUG
@@ -161,32 +161,32 @@ void adcImmediate(CPU* cpu, const RAM* ram) {
 void ldaImmediate(CPU* cpu, const RAM* ram) {
    byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
    cpu->a = val;
-   setLDFlags(cpu, cpu->a);
+   setZNFlags(cpu, cpu->a);
 }
 
 void ldaZeroPage(CPU* cpu, const RAM* ram) {
    cpu->a = ldZPHelper(&cpu->pc, ram, &cpu->cycles);
-   setLDFlags(cpu, cpu->a);
+   setZNFlags(cpu, cpu->a);
 }
 
 void ldaZeroPageX(CPU* cpu, const RAM* ram) {
    cpu->a = ldZPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
-   setLDFlags(cpu, cpu->a);
+   setZNFlags(cpu, cpu->a);
 }
 
 void ldaAbsolute(CPU* cpu, const RAM* ram) {
    cpu->a = ldAbsHelper(&cpu->pc, ram, &cpu->cycles);
-   setLDFlags(cpu, cpu->a);
+   setZNFlags(cpu, cpu->a);
 }
 
 void ldaAbsoluteX(CPU* cpu, const RAM* ram) {
    cpu->a = ldAbsRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
-   setLDFlags(cpu, cpu->a);
+   setZNFlags(cpu, cpu->a);
 }
 
 void ldaAbsoluteY(CPU* cpu, const RAM* ram) {
    cpu->a = ldAbsRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
-   setLDFlags(cpu, cpu->a);
+   setZNFlags(cpu, cpu->a);
 }
 
 
@@ -197,7 +197,7 @@ void ldaIndirectX(CPU* cpu, const RAM* ram) {
    word addr = readWordFromAddr(addrZp, ram, &cpu->cycles);
 
    cpu->a = readByteFromAddr(addr, ram, &cpu->cycles);
-   setLDFlags(cpu, cpu->a);
+   setZNFlags(cpu, cpu->a);
 }
 
 void ldaIndirectY(CPU* cpu, const RAM* ram) {
@@ -209,59 +209,59 @@ void ldaIndirectY(CPU* cpu, const RAM* ram) {
    }
 
    cpu->a = readByteFromAddr(addrY, ram, &cpu->cycles);
-   setLDFlags(cpu, cpu->a);
+   setZNFlags(cpu, cpu->a);
 }
 
 void ldxImmediate(CPU* cpu, const RAM* ram) {
    byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
    cpu->x = val;
-   setLDFlags(cpu, cpu->x);
+   setZNFlags(cpu, cpu->x);
 }
 
 void ldxZeroPage(CPU* cpu, const RAM* ram) {
    cpu->x = ldZPHelper(&cpu->pc, ram, &cpu->cycles);
-   setLDFlags(cpu, cpu->x);
+   setZNFlags(cpu, cpu->x);
 }
 
 void ldxZeroPageY(CPU* cpu, const RAM* ram) {
    cpu->x = ldZPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
-   setLDFlags(cpu, cpu->x);
+   setZNFlags(cpu, cpu->x);
 }
 
 void ldxAbsolute(CPU* cpu, const RAM* ram) {
    cpu->x = ldAbsHelper(&cpu->pc, ram, &cpu->cycles);
-   setLDFlags(cpu, cpu->x);
+   setZNFlags(cpu, cpu->x);
 }
 
 void ldxAbsoluteY(CPU* cpu, const RAM* ram) {
    cpu->x = ldAbsRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->y);
-   setLDFlags(cpu, cpu->x);
+   setZNFlags(cpu, cpu->x);
 }
 
 void ldyImmediate(CPU* cpu, const RAM* ram) {
    byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
    cpu->y = val;
-   setLDFlags(cpu, cpu->y);
+   setZNFlags(cpu, cpu->y);
 }
 
 void ldyZeroPage(CPU* cpu, const RAM* ram) {
    cpu->y = ldZPHelper(&cpu->pc, ram, &cpu->cycles);
-   setLDFlags(cpu, cpu->y);
+   setZNFlags(cpu, cpu->y);
 }
 
 void ldyZeroPageX(CPU* cpu, const RAM* ram) {
    cpu->y = ldZPRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
-   setLDFlags(cpu, cpu->y);
+   setZNFlags(cpu, cpu->y);
 }
 
 void ldyAbsolute(CPU* cpu, const RAM* ram) {
    cpu->y = ldAbsHelper(&cpu->pc, ram, &cpu->cycles);
-   setLDFlags(cpu, cpu->y);
+   setZNFlags(cpu, cpu->y);
 }
 
 void ldyAbsoluteX(CPU* cpu, const RAM* ram) {
    cpu->y = ldAbsRegHelper(&cpu->pc, ram, &cpu->cycles, cpu->x);
-   setLDFlags(cpu, cpu->y);
+   setZNFlags(cpu, cpu->y);
 }
 
 void staZeroPage(CPU* cpu, RAM* ram) {
@@ -348,6 +348,30 @@ void styAbsolute(CPU* cpu, RAM* ram) {
    writeByteToMemory(cpu->y, addr, ram, &cpu->cycles);
 }
 
+void tax(CPU* cpu) {
+   cpu->x = cpu->a;
+   cpu->cycles++;
+   setZNFlags(cpu, cpu->x);
+}
+
+void txa(CPU* cpu) {
+   cpu->a = cpu->x;
+   cpu->cycles++;
+   setZNFlags(cpu, cpu->a);
+}
+
+void tay(CPU* cpu) {
+   cpu->y = cpu->a;
+   cpu->cycles++;
+   setZNFlags(cpu, cpu->y);
+}
+
+void tya(CPU* cpu) {
+   cpu->a = cpu->y;
+   cpu->cycles++;
+   setZNFlags(cpu, cpu->a);
+}
+
 #pragma endregion
 
 //Instruction map.
@@ -386,6 +410,10 @@ void(*insTable[256])(CPU* cpu, RAM* ram) = {
    [INS_STY_ZP] = &styZeroPage,
    [INS_STY_ZPX] = &styZeroPageX,
    [INS_STY_ABS] = &styAbsolute,
+   [INS_TAX] = &tax,
+   [INS_TXA] = &txa,
+   [INS_TAY] = &tay,
+   [INS_TYA] = &tya,
 };
 
 RAM* initRAM() {

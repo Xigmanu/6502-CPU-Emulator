@@ -56,6 +56,15 @@
 #define INS_STY_ABS 0x8C   //STY Absolute. Takes 4 cycles.
 
 #pragma endregion
+#pragma region REG_TRANSFERS
+
+#define INS_TAX 0xAA       //TAX. Takes 2 cycles.
+#define INS_TXA 0x8A       //TXA. Takes 2 cycles.
+#define INS_TAY 0xA8       //TAY. Takes 2 cycles.
+#define INS_TYA 0x98       //TYA. Takes 2 cycles.
+
+#pragma endregion
+
 
 typedef unsigned char byte;
 typedef unsigned short word;

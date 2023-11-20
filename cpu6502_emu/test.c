@@ -685,6 +685,74 @@ void testSTYAbsolute(void) {
    freeRAM(ram);
 }
 
+void testTAX(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   resetCPU(&cpu, 0xFFFC);
+   RAM* ram = initRAM();
+
+   cpu.a = 0x42;
+   ram->data[0xFFFC] = INS_TAX;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(cpu.a, cpu.x, "X");
+   ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
+   ASSERT_EQUAL(2, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+void testTXA(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   resetCPU(&cpu, 0xFFFC);
+   RAM* ram = initRAM();
+
+   cpu.x = 0x42;
+   ram->data[0xFFFC] = INS_TXA;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(cpu.x, cpu.a, "A");
+   ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
+   ASSERT_EQUAL(2, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+void testTAY(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   resetCPU(&cpu, 0xFFFC);
+   RAM* ram = initRAM();
+
+   cpu.a = 0x42;
+   ram->data[0xFFFC] = INS_TAY;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(cpu.a, cpu.y, "Y");
+   ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
+   ASSERT_EQUAL(2, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+void testTYA(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   resetCPU(&cpu, 0xFFFC);
+   RAM* ram = initRAM();
+
+   cpu.y = 0x42;
+   ram->data[0xFFFC] = INS_TAY;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(cpu.y, cpu.a, "A");
+   ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
+   ASSERT_EQUAL(2, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
 void testADCImmediate(void) {
    PRINT_TEST_NAME();
    CPU cpu;
@@ -708,7 +776,7 @@ void testADCImmediate(void) {
    freeRAM(ram);
 }
 
-void(*tests[TEST_COUNT + 1])(void) = {
+void(*tests[TEST_COUNT])(void) = {
    [0] = &testResetCPU,
    [1] = &testJSR,
    [2] = &testRTS,
@@ -743,6 +811,10 @@ void(*tests[TEST_COUNT + 1])(void) = {
    [31] = &testSTYZeroPage,
    [32] = &testSTYZeroPageX,
    [33] = &testSTYAbsolute,
+   [34] = &testTAX,
+   [35] = &testTXA,
+   [36] = &testTAY,
+   [37] = &testTYA,
 };
 
 void runTests() {
