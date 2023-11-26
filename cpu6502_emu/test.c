@@ -1,7 +1,7 @@
 #include "test.h"
 #include <stdlib.h>
 
-void testResetCPU(void) {
+static void testResetCPU(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -23,7 +23,7 @@ void testResetCPU(void) {
    freeRAM(ram);
 }
 
-void testJSR(void) {
+static void testJSR(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -42,7 +42,7 @@ void testJSR(void) {
 
    freeRAM(ram);
 }
-void testRTS(void) {
+static void testRTS(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -63,7 +63,7 @@ void testRTS(void) {
    freeRAM(ram);
 }
 
-void testLDAImmediate(void) {
+static void testLDAImmediate(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -83,7 +83,7 @@ void testLDAImmediate(void) {
    freeRAM(ram);
 }
 
-void testLDAZeroPage(void) {
+static void testLDAZeroPage(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -103,7 +103,7 @@ void testLDAZeroPage(void) {
    freeRAM(ram);
 }
 
-void testLDAZeroPageX(void) {
+static void testLDAZeroPageX(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -124,7 +124,7 @@ void testLDAZeroPageX(void) {
    freeRAM(ram);
 }
 
-void testLDAAbsolute(void) {
+static void testLDAAbsolute(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -144,7 +144,7 @@ void testLDAAbsolute(void) {
 
    freeRAM(ram);
 }
-void testLDAAbsoluteX(void) {
+static void testLDAAbsoluteX(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -165,7 +165,7 @@ void testLDAAbsoluteX(void) {
 
    freeRAM(ram);
 }
-void testLDAAbsoluteY(void) {
+static void testLDAAbsoluteY(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -186,7 +186,7 @@ void testLDAAbsoluteY(void) {
 
    freeRAM(ram);
 }
-void testLDAIndirectX(void) {
+static void testLDAIndirectX(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -209,7 +209,7 @@ void testLDAIndirectX(void) {
    freeRAM(ram);
 }
 
-void testLDAIndirectY(void) {
+static void testLDAIndirectY(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -232,7 +232,7 @@ void testLDAIndirectY(void) {
    freeRAM(ram);
 }
 
-void testLDXImmediate(void) {
+static void testLDXImmediate(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -250,7 +250,7 @@ void testLDXImmediate(void) {
 
    freeRAM(ram);
 }
-void testLDXZeroPage(void) {
+static void testLDXZeroPage(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -269,7 +269,7 @@ void testLDXZeroPage(void) {
 
    freeRAM(ram);
 }
-void testLDXZeroPageY(void) {
+static void testLDXZeroPageY(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -289,7 +289,7 @@ void testLDXZeroPageY(void) {
 
    freeRAM(ram);
 }
-void testLDXAbsolute(void) {
+static void testLDXAbsolute(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -310,7 +310,7 @@ void testLDXAbsolute(void) {
    freeRAM(ram);
 }
 
-void testLDXAbsoluteY(void) {
+static void testLDXAbsoluteY(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -332,7 +332,7 @@ void testLDXAbsoluteY(void) {
    freeRAM(ram);
 }
 
-void testLDYImmediate(void) {
+static void testLDYImmediate(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -351,7 +351,7 @@ void testLDYImmediate(void) {
    freeRAM(ram);
 }
 
-void testLDYZeroPage(void) {
+static void testLDYZeroPage(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -371,7 +371,7 @@ void testLDYZeroPage(void) {
    freeRAM(ram);
 }
 
-void testLDYZeroPageX(void) {
+static void testLDYZeroPageX(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -392,7 +392,7 @@ void testLDYZeroPageX(void) {
    freeRAM(ram);
 }
 
-void testLDYAbsolute(void) {
+static void testLDYAbsolute(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -413,7 +413,7 @@ void testLDYAbsolute(void) {
    freeRAM(ram);
 }
 
-void testLDYAbsoluteX(void) {
+static void testLDYAbsoluteX(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -435,7 +435,7 @@ void testLDYAbsoluteX(void) {
    freeRAM(ram);
 }
 
-void testSTAZeroPage(void) {
+static void testSTAZeroPage(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -453,7 +453,7 @@ void testSTAZeroPage(void) {
    freeRAM(ram);
 }
 
-void testSTAZeroPageX(void) {
+static void testSTAZeroPageX(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -472,7 +472,7 @@ void testSTAZeroPageX(void) {
    freeRAM(ram);
 }
 
-void testSTAAbsolute(void) {
+static void testSTAAbsolute(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -491,7 +491,7 @@ void testSTAAbsolute(void) {
    freeRAM(ram);
 }
 
-void testSTAAbsoluteX(void) {
+static void testSTAAbsoluteX(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -511,7 +511,7 @@ void testSTAAbsoluteX(void) {
    freeRAM(ram);
 }
 
-void testSTAAbsoluteY(void) {
+static void testSTAAbsoluteY(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -531,7 +531,7 @@ void testSTAAbsoluteY(void) {
    freeRAM(ram);
 }
 
-void testSTAIndirectX(void) {
+static void testSTAIndirectX(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -552,7 +552,7 @@ void testSTAIndirectX(void) {
    freeRAM(ram);
 }
 
-void testSTAIndirectY(void) {
+static void testSTAIndirectY(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -568,12 +568,12 @@ void testSTAIndirectY(void) {
 
    ASSERT_EQUAL(0x42, ram->data[0xD224], "MEM");
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
-   ASSERT_EQUAL(5, cpu.cycles, "Cycles");
+   ASSERT_EQUAL(6, cpu.cycles, "Cycles");
 
    freeRAM(ram);
 }
 
-void testSTXZeroPage(void) {
+static void testSTXZeroPage(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -591,7 +591,7 @@ void testSTXZeroPage(void) {
    freeRAM(ram);
 }
 
-void testSTXZeroPageY(void) {
+static void testSTXZeroPageY(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -610,7 +610,7 @@ void testSTXZeroPageY(void) {
    freeRAM(ram);
 }
 
-void testSTXAbsolute(void) {
+static void testSTXAbsolute(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -629,7 +629,7 @@ void testSTXAbsolute(void) {
    freeRAM(ram);
 }
 
-void testSTYZeroPage(void) {
+static void testSTYZeroPage(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -647,7 +647,7 @@ void testSTYZeroPage(void) {
    freeRAM(ram);
 }
 
-void testSTYZeroPageX(void) {
+static void testSTYZeroPageX(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -666,7 +666,7 @@ void testSTYZeroPageX(void) {
    freeRAM(ram);
 }
 
-void testSTYAbsolute(void) {
+static void testSTYAbsolute(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -685,7 +685,7 @@ void testSTYAbsolute(void) {
    freeRAM(ram);
 }
 
-void testTAX(void) {
+static void testTAX(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    resetCPU(&cpu, 0xFFFC);
@@ -702,7 +702,7 @@ void testTAX(void) {
    freeRAM(ram);
 }
 
-void testTXA(void) {
+static void testTXA(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    resetCPU(&cpu, 0xFFFC);
@@ -719,7 +719,7 @@ void testTXA(void) {
    freeRAM(ram);
 }
 
-void testTAY(void) {
+static void testTAY(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    resetCPU(&cpu, 0xFFFC);
@@ -736,7 +736,7 @@ void testTAY(void) {
    freeRAM(ram);
 }
 
-void testTYA(void) {
+static void testTYA(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    resetCPU(&cpu, 0xFFFC);
@@ -753,7 +753,7 @@ void testTYA(void) {
    freeRAM(ram);
 }
 
-void testADCImmediate(void) {
+static void testADCImmediate(void) {
    PRINT_TEST_NAME();
    CPU cpu;
    RAM* ram = initRAM();
@@ -776,45 +776,46 @@ void testADCImmediate(void) {
    freeRAM(ram);
 }
 
-void(*tests[TEST_COUNT])(void) = {
-   [0] = &testResetCPU,
-   [1] = &testJSR,
-   [2] = &testRTS,
-   [3] = &testLDAImmediate,
-   [4] = &testLDAZeroPage,
-   [5] = &testLDAZeroPageX,
-   [6] = &testLDAAbsolute,
-   [7] = &testLDAAbsoluteX,
-   [8] = &testLDAAbsoluteY,
-   [9] = &testLDAIndirectX,
-   [10] = &testLDAIndirectY,
-   [11] = &testLDXImmediate,
-   [12] = &testLDXZeroPage,
-   [13] = &testLDAZeroPageX,
-   [14] = &testLDXAbsolute,
-   [15] = &testLDXAbsoluteY,
-   [16] = &testLDYImmediate,
-   [17] = &testLDYZeroPage,
-   [18] = &testLDYZeroPageX,
-   [19] = &testLDYAbsolute,
-   [20] = &testLDYAbsoluteX,
-   [21] = &testSTAZeroPage,
-   [22] = &testSTAZeroPageX,
-   [23] = &testSTAAbsolute,
-   [24] = &testSTAAbsoluteX,
-   [25] = &testSTAAbsoluteY,
-   [26] = &testSTAIndirectX,
-   [27] = &testSTAIndirectY,
-   [28] = &testSTXZeroPage,
-   [29] = &testSTXZeroPageY,
-   [30] = &testSTXAbsolute,
-   [31] = &testSTYZeroPage,
-   [32] = &testSTYZeroPageX,
-   [33] = &testSTYAbsolute,
-   [34] = &testTAX,
-   [35] = &testTXA,
-   [36] = &testTAY,
-   [37] = &testTYA,
+void(*tests[])(void) = {
+   &testResetCPU,
+   &testJSR,
+   &testRTS,
+   &testLDAImmediate,
+   &testLDAZeroPage,
+   &testLDAZeroPageX,
+   &testLDAAbsolute,
+   &testLDAAbsoluteX,
+   &testLDAAbsoluteY,
+   &testLDAIndirectX,
+   &testLDAIndirectY,
+   &testLDXImmediate,
+   &testLDXZeroPage,
+   &testLDAZeroPageX,
+   &testLDXZeroPageY,
+   &testLDXAbsolute,
+   &testLDXAbsoluteY,
+   &testLDYImmediate,
+   &testLDYZeroPage,
+   &testLDYZeroPageX,
+   &testLDYAbsolute,
+   &testLDYAbsoluteX,
+   &testSTAZeroPage,
+   &testSTAZeroPageX,
+   &testSTAAbsolute,
+   &testSTAAbsoluteX,
+   &testSTAAbsoluteY,
+   &testSTAIndirectX,
+   &testSTAIndirectY,
+   &testSTXZeroPage,
+   &testSTXZeroPageY,
+   &testSTXAbsolute,
+   &testSTYZeroPage,
+   &testSTYZeroPageX,
+   &testSTYAbsolute,
+   &testTAX,
+   &testTXA,
+   &testTAY,
+   &testTYA,
 };
 
 void runTests() {
