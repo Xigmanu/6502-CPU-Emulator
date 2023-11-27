@@ -58,13 +58,22 @@
 #pragma endregion
 #pragma region REG_TRANSFERS
 
-#define INS_TAX 0xAA       //TAX. Takes 2 cycles.
-#define INS_TXA 0x8A       //TXA. Takes 2 cycles.
-#define INS_TAY 0xA8       //TAY. Takes 2 cycles.
-#define INS_TYA 0x98       //TYA. Takes 2 cycles.
+#define INS_TAX 0xAA       //Transfer accumulator to X. Takes 2 cycles.
+#define INS_TXA 0x8A       //Transfer accumulator to Y. Takes 2 cycles.
+#define INS_TAY 0xA8       //Transfer X to accumulator. Takes 2 cycles.
+#define INS_TYA 0x98       //Transfer Y to accumulator. Takes 2 cycles.
 
 #pragma endregion
+#pragma region STACK_OPS
 
+#define INS_TSX 0xBA       //Transfer SP to X. Takes 2 cycles.
+#define INS_TXS 0x9A       //Transfer X to SP. Takes 2 cycles.
+#define INS_PHA 0x48       //Push Accumulator. Takes 3 cycles.
+#define INS_PHP 0x08       //Push Processor Status. Takes 3 cycles.
+#define INS_PLA 0x68       //Pull Accumulator. Takes 4 cycles.
+#define INS_PLP 0x28       //Pull Processor Status. Takes 4 cycles.
+
+#pragma endregion
 
 typedef unsigned char byte;
 typedef unsigned short word;
@@ -76,7 +85,7 @@ struct RAM {
 
 struct CPU {
    word pc;
-   byte sp;
+   word sp;
 
    byte a;
    byte x;

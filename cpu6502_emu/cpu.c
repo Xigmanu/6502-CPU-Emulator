@@ -4,17 +4,6 @@
 
 #pragma region Memory helpers
 
-static byte readByteFromPC(word* pc, const RAM* ram, u32* cycles) {
-   byte val = ram->data[*pc];
-#ifdef _DEBUG
-   printf("DEBUG\t| Read [0x%X] from [0x%X]\n", val, *pc);
-#endif //_DEBUG
-   (*pc)++;
-   (*cycles)++;
-
-   return val;
-}
-
 static byte readByteFromAddr(word addr, const RAM* ram, u32* cycles) {
    byte val = ram->data[addr];
    (*cycles)++;
@@ -24,17 +13,6 @@ static byte readByteFromAddr(word addr, const RAM* ram, u32* cycles) {
 #endif //_DEBUG
 
    return val;
-}
-
-static word readWordFromPC(word* pc, const RAM* ram, u32* cycles) {
-   byte loB = readByteFromPC(pc, ram, cycles);
-   byte hiB = readByteFromPC(pc, ram, cycles);
-
-#ifdef _DEBUG
-   printf("DEBUG\t| Read word. loB=[0x%X], hiB=[0x%X]\n", loB, hiB);
-#endif // _DEBUG
-
-   return (word)(loB | (hiB << 8));
 }
 
 static word readWordFromAddr(word addr, const RAM* ram, u32* cycles) {
@@ -48,6 +26,18 @@ static word readWordFromAddr(word addr, const RAM* ram, u32* cycles) {
    return (word)(loB | (hiB << 8));
 }
 
+static byte readByteFromPC(word* pc, const RAM* ram, u32* cycles) {
+   byte val = readByteFromAddr(*pc, ram, cycles);
+   (*pc)++;
+   return val;
+}
+
+static word readWordFromPC(word* pc, const RAM* ram, u32* cycles) {
+   word val = readWordFromAddr(*pc, ram, cycles);
+   (*pc)+=2;
+   return val;
+}
+
 static void writeByteToMemory(byte val, word addr, RAM* ram, u32* cycles) {
    ram->data[addr] = val;
    (*cycles)++;
@@ -56,60 +46,46 @@ static void writeByteToMemory(byte val, word addr, RAM* ram, u32* cycles) {
 #endif // _DEBUG
 }
 
-static void pushWordToStack(RAM* ram, byte* sp, word val, u32* cycles) {
+static void pushByteToStack(RAM* ram, word* sp, byte val, u32* cycles) {
    (*sp)--;
-   ram->data[*sp] = val & 0xFF;
-   (*sp)--;
-   ram->data[*sp] = val >> 8;
-
-   (*cycles) += 2;
+   ram->data[*sp] = val;
+   (*cycles)++;
 #ifdef _DEBUG
    printf("DEBUG\t| Pushed [0x%X] to the stack. Current SP: [0x%X]\n", val, *sp);
 #endif // _DEBUG
 }
 
-static word popWordFromStack(const RAM* ram, byte* sp, u32* cycles) {
-   byte hB = ram->data[*sp];
+static byte popByteFromStack(const RAM* ram, word* sp, u32* cycles) {
+   byte val = ram->data[*sp];
    (*sp)++;
-   byte lB = ram->data[*sp];
-   (*sp)++;
-   (*cycles) += 4;
-
-   word val = (word)((hB << 8) | lB);
-
+   (*cycles)++;
 #ifdef _DEBUG
    printf("DEBUG\t| Popped [0x%X] from the stack. Current SP: [0x%X]\n", val, *sp);
 #endif //_DEBUG
-
    return val;
+}
+
+static void pushWordToStack(RAM* ram, word* sp, word val, u32* cycles) {
+   pushByteToStack(ram, sp, (val >> 8), cycles);
+   pushByteToStack(ram, sp, (val & 0xFF), cycles);
+}
+
+static word popWordFromStack(const RAM* ram, word* sp, u32* cycles) {
+   byte lB = popByteFromStack(ram, sp, cycles);
+   byte hB = popByteFromStack(ram, sp, cycles);
+   (*cycles)++;
+   return (word)((hB << 8) | lB);
 }
 
 #pragma endregion
 
-#pragma region Instruction helpers
+#pragma region Addressing mode helpers
 
 typedef enum {
    NONE,
    X,
    Y
 } AddrModeReg;
-
-static void setZNFlags(CPU* cpu, byte reg) {
-   cpu->z = (reg == 0);
-   cpu->n = (reg & 0x80) > 0;
-#ifdef _DEBUG
-   printf("DEBUG\t| Set Flags: Z: [0x%X], N: [0x%X]\n", cpu->z, cpu->n);
-#endif // _DEBUG
-}
-
-static void setADCFlags(CPU* cpu, word sum, byte op) {
-   setZNFlags(cpu, cpu->a);
-   cpu->c = sum > 0xFF;
-   cpu->v = ((cpu->a ^ op) & 0x80) && ((cpu->a ^ sum) & 0x80);
-#ifdef _DEBUG
-   printf("DEBUG\t| Set Flags: C: [0x%X], V: [0x%X]\n", cpu->c, cpu->v);
-#endif // _DEBUG
-}
 
 static byte zpAddr(CPU* cpu, const RAM* ram, AddrModeReg reg) {
    byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
@@ -181,11 +157,52 @@ static word indAddr(CPU* cpu, const RAM* ram, AddrModeReg reg, bool canPageCross
 
 #pragma endregion
 
+#pragma region Flag helpers
+
+static void updatePS(CPU* cpu) {
+   byte ps = 0x0;
+
+   ps |= (cpu->n << 7);
+   ps |= (cpu->v << 6);
+   ps |= (cpu->b << 4);
+   ps |= (cpu->d << 3);
+   ps |= (cpu->i << 2);
+   ps |= (cpu->z << 1);
+   ps |= cpu->c;
+
+   cpu->ps = ps;
+
+#ifdef _DEBUG
+   printf("DEBUG\t| Set Processor Status: PS: [0x%X]\n", ps);
+#endif // _DEBUG
+}
+
+static void setZNFlags(CPU* cpu, byte reg) {
+   cpu->z = (reg == 0);
+   cpu->n = (reg & 0x80) > 0;
+#ifdef _DEBUG
+   printf("DEBUG\t| Set Flags: Z: [0x%X], N: [0x%X]\n", cpu->z, cpu->n);
+#endif // _DEBUG
+   updatePS(cpu);
+}
+
+static void setCVFlags(CPU* cpu, word sum, byte op) {
+   setZNFlags(cpu, cpu->a);
+   cpu->c = sum > 0xFF;
+   cpu->v = ((cpu->a ^ op) & 0x80) && ((cpu->a ^ sum) & 0x80);
+#ifdef _DEBUG
+   printf("DEBUG\t| Set Flags: C: [0x%X], V: [0x%X]\n", cpu->c, cpu->v);
+#endif // _DEBUG
+   updatePS(cpu);
+}
+
+#pragma endregion
+
 #pragma region Instruction handlers
 
-static void jsr(CPU* cpu, RAM* ram) {
-   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
-   pushWordToStack(ram, &cpu->sp, cpu->pc - 1, &cpu->cycles);
+static void jsr(CPU* cpu, RAM* ram) { //takes 1 cycle to fetch op code
+   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles); // takes 2 cycles
+   pushWordToStack(ram, &cpu->sp, cpu->pc - 1, &cpu->cycles); // takes 4 cycles
 
    cpu->pc = addr;
    cpu->cycles++;
@@ -194,14 +211,14 @@ static void jsr(CPU* cpu, RAM* ram) {
 static void rts(CPU* cpu, const RAM* ram) {
    word addr = popWordFromStack(ram, &cpu->sp, &cpu->cycles);
    cpu->pc = addr + 1; //Not sure if correct but this is the only way program flow does not break.
-   cpu->cycles++;
+   cpu->cycles += 2;
 }
 
 static void adcImmediate(CPU* cpu, const RAM* ram) {
    byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
    word sum = cpu->a + val + cpu->c;
    cpu->a = (byte)sum;
-   setADCFlags(cpu, sum, val);
+   setCVFlags(cpu, sum, val);
 }
 
 static void ldaImmediate(CPU* cpu, const RAM* ram) {
@@ -411,6 +428,53 @@ static void tya(CPU* cpu, const RAM* ram) {
    setZNFlags(cpu, cpu->a);
 }
 
+static void tsx(CPU* cpu, const RAM* ram) {
+   (void)ram;
+
+   cpu->x = (cpu->sp & 0x00FF);
+   cpu->cycles++;
+   setZNFlags(cpu, cpu->x);
+}
+
+static void txs(CPU* cpu, const RAM* ram) {
+   (void)ram;
+
+   cpu->sp = 0x0100 | cpu->x;
+   cpu->cycles++;
+}
+
+static void pha(CPU* cpu, RAM* ram) {
+   pushByteToStack(ram, &cpu->sp, cpu->a, &cpu->cycles);
+   cpu->cycles++;
+}
+
+static void php(CPU* cpu, RAM* ram) {
+   pushByteToStack(ram, &cpu->sp, cpu->ps, &cpu->cycles);
+   cpu->cycles++;
+}
+
+static void pla(CPU* cpu, const RAM* ram) {
+   byte val = popByteFromStack(ram, &cpu->sp, &cpu->cycles);
+   cpu->a = val;
+   cpu->cycles += 2;
+   setZNFlags(cpu, cpu->a);
+}
+
+static void plp(CPU* cpu, const RAM* ram) {
+   byte val = popByteFromStack(ram, &cpu->sp, &cpu->cycles);
+   cpu->ps = val;
+   cpu->cycles++;
+
+   cpu->c = (val & 0b00000001) != 0;
+   cpu->n = (val & 0b10000000) != 0;
+   cpu->v = (val & 0b01000000) != 0;
+   cpu->i = (val & 0b00010000) != 0;
+   cpu->d = (val & 0b00001000) != 0;
+   cpu->b = (val & 0b00000100) != 0;
+   cpu->v = (val & 0b00000010) != 0;
+   cpu->cycles++;
+}
+
 #pragma endregion
 
 //Instruction map.
@@ -453,6 +517,12 @@ void(*insTable[256])(CPU* cpu, RAM* ram) = {
    [INS_TXA] = &txa,
    [INS_TAY] = &tay,
    [INS_TYA] = &tya,
+   [INS_TSX] = &tsx,
+   [INS_TXS] = &txs,
+   [INS_PHA] = &pha,
+   [INS_PHP] = &php,
+   [INS_PLA] = &pla,
+   [INS_PLP] = &plp,
 };
 
 RAM* initRAM() {
@@ -488,7 +558,7 @@ void freeRAM(RAM* ram) {
 
 void resetCPU(CPU* cpu, word sPC) {
    cpu->pc = sPC;
-   cpu->sp = 0xFF;
+   cpu->sp = 0x01FF;
 
    cpu->c = 0;
    cpu->z = 0;

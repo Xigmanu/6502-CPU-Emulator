@@ -8,7 +8,7 @@ static void testResetCPU(void) {
    resetCPU(&cpu, 0xFFFC);
 
    ASSERT_EQUAL(0xFFFC, cpu.pc, "PC");
-   ASSERT_EQUAL(0xFF, cpu.sp, "SP");
+   ASSERT_EQUAL(0x01FF, cpu.sp, "SP");
    ASSERT_EQUAL(0, cpu.c, "C");
    ASSERT_EQUAL(0, cpu.z, "Z");
    ASSERT_EQUAL(0, cpu.i, "I");
@@ -268,7 +268,7 @@ static void testLDXZeroPage(void) {
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
    freeRAM(ram);
-}
+} 
 static void testLDXZeroPageY(void) {
    PRINT_TEST_NAME();
    CPU cpu;
@@ -742,13 +742,171 @@ static void testTYA(void) {
    resetCPU(&cpu, 0xFFFC);
    RAM* ram = initRAM();
 
-   cpu.y = 0x42;
-   ram->data[0xFFFC] = INS_TAY;
+   cpu.y = 0xBE;
+   ram->data[0xFFFC] = INS_TYA;
    exec(&cpu, ram, 1);
 
    ASSERT_EQUAL(cpu.y, cpu.a, "A");
    ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
+   ASSERT_EQUAL(0x0, cpu.c, "C");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+   ASSERT_EQUAL(0x0, cpu.i, "I");
+   ASSERT_EQUAL(0x0, cpu.d, "D");
+   ASSERT_EQUAL(0x0, cpu.b, "B");
+   ASSERT_EQUAL(0x0, cpu.v, "V");
+   ASSERT_EQUAL(0x1, cpu.n, "N");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+static void testTSX(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   resetCPU(&cpu, 0xFFFC);
+   RAM* ram = initRAM();
+
+   cpu.sp = 0x42;
+   ram->data[0xFFFC] = INS_TSX;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x42, cpu.x, "X");
+   ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
+   ASSERT_EQUAL(0x0, cpu.c, "C");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+   ASSERT_EQUAL(0x0, cpu.i, "I");
+   ASSERT_EQUAL(0x0, cpu.d, "D");
+   ASSERT_EQUAL(0x0, cpu.b, "B");
+   ASSERT_EQUAL(0x0, cpu.v, "V");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(2, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+static void testTXS(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   resetCPU(&cpu, 0xFFFC);
+   RAM* ram = initRAM();
+   
+   cpu.x = 0x42;
+   ram->data[0xFFFC] = INS_TXS;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x42, cpu.x, "X");
+   ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
+   ASSERT_EQUAL(0x0, cpu.c, "C");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+   ASSERT_EQUAL(0x0, cpu.i, "I");
+   ASSERT_EQUAL(0x0, cpu.d, "D");
+   ASSERT_EQUAL(0x0, cpu.b, "B");
+   ASSERT_EQUAL(0x0, cpu.v, "V");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(2, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+static void testPHA(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   resetCPU(&cpu, 0xFFFC);
+   RAM* ram = initRAM();
+
+   cpu.a = 0x42;
+   ram->data[0xFFFC] = INS_PHA;
+ 
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x01FE, cpu.sp, "SP");
+   ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
+   ASSERT_EQUAL(0x0, cpu.c, "C");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+   ASSERT_EQUAL(0x0, cpu.i, "I");
+   ASSERT_EQUAL(0x0, cpu.d, "D");
+   ASSERT_EQUAL(0x0, cpu.b, "B");
+   ASSERT_EQUAL(0x0, cpu.v, "V");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(3, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+static void testPHP(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   resetCPU(&cpu, 0xFFFC);
+   RAM* ram = initRAM();
+
+   ram->data[0xFFFC] = INS_LDA_IM;
+   ram->data[0xFFFD] = 0xBE;
+   ram->data[0xFFFE] = INS_PHP;
+   exec(&cpu, ram, 2);
+   
+   ASSERT_EQUAL(0x01FE, cpu.sp, "SP");
+   ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
+   ASSERT_EQUAL(0x80, cpu.ps, "PS");
+   ASSERT_EQUAL(0x0, cpu.c, "C");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+   ASSERT_EQUAL(0x0, cpu.i, "I");
+   ASSERT_EQUAL(0x0, cpu.d, "D");
+   ASSERT_EQUAL(0x0, cpu.b, "B");
+   ASSERT_EQUAL(0x0, cpu.v, "V");
+   ASSERT_EQUAL(0x1, cpu.n, "N");
+   ASSERT_EQUAL(5, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+static void testPLA(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   resetCPU(&cpu, 0xFFFC);
+   RAM* ram = initRAM();
+   
+   cpu.sp = 0x01FE;
+   ram->data[0x01FE] = 0x42;
+   ram->data[0xFFFC] = INS_PLA;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x01FF, cpu.sp, "SP");
+   ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
+   ASSERT_EQUAL(0x0, cpu.ps, "PS");
+   ASSERT_EQUAL(0x0, cpu.c, "C");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+   ASSERT_EQUAL(0x0, cpu.i, "I");
+   ASSERT_EQUAL(0x0, cpu.d, "D");
+   ASSERT_EQUAL(0x0, cpu.b, "B");
+   ASSERT_EQUAL(0x0, cpu.v, "V");
+   ASSERT_EQUAL(0x0, cpu.n, "N");
+   ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+static void testPLP(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   resetCPU(&cpu, 0xFFFC);
+   RAM* ram = initRAM();
+
+   cpu.sp = 0x01FE;
+   ram->data[0x01FE] = 0x81;
+   ram->data[0xFFFC] = INS_PLP;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0x01FF, cpu.sp, "SP");
+   ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
+   ASSERT_EQUAL(0x81, cpu.ps, "PS");
+   ASSERT_EQUAL(0x1, cpu.c, "C");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+   ASSERT_EQUAL(0x0, cpu.i, "I");
+   ASSERT_EQUAL(0x0, cpu.d, "D");
+   ASSERT_EQUAL(0x0, cpu.b, "B");
+   ASSERT_EQUAL(0x0, cpu.v, "V");
+   ASSERT_EQUAL(0x1, cpu.n, "N");
+   ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
    freeRAM(ram);
 }
@@ -816,10 +974,16 @@ void(*tests[])(void) = {
    &testTXA,
    &testTAY,
    &testTYA,
+   &testTSX,
+   &testTXS,
+   &testPHA,
+   &testPHP,
+   &testPLA,
+   &testPLP
 };
 
 void runTests() {
-   for (u32 i = 0; i < TEST_COUNT; i++) {
+   for (u32 i = 0; i <= TEST_COUNT; i++) {
       if (NULL != tests[i]) {
          tests[i]();
       }
