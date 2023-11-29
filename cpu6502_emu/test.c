@@ -29,10 +29,10 @@ static void testJSR(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
-   ram->data[0xFFFC] = INS_JSR;
+   ram->data[0xFFFC] = JSR;
    ram->data[0xFFFD] = 0x42;
    ram->data[0xFFFE] = 0x24;
-   ram->data[0x2442] = INS_LDA_IM;
+   ram->data[0x2442] = LDA_IM;
    ram->data[0x2443] = 0x51;
    exec(&cpu, ram, 2);
 
@@ -48,12 +48,12 @@ static void testRTS(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
-   ram->data[0xFFFC] = INS_JSR;
+   ram->data[0xFFFC] = JSR;
    ram->data[0xFFFD] = 0x42;
    ram->data[0xFFFE] = 0x24;
-   ram->data[0x2442] = INS_LDA_IM;
+   ram->data[0x2442] = LDA_IM;
    ram->data[0x2443] = 0x51;
-   ram->data[0x2444] = INS_RTS;
+   ram->data[0x2444] = RTS;
    exec(&cpu, ram, 3);
 
    ASSERT_EQUAL(0x51, cpu.a, "A");
@@ -69,7 +69,7 @@ static void testLDAImmediate(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
-   ram->data[0xFFFC] = INS_LDA_IM;
+   ram->data[0xFFFC] = LDA_IM;
    ram->data[0xFFFD] = 0x42;
 
    exec(&cpu, ram, 1);
@@ -89,7 +89,7 @@ static void testLDAZeroPage(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
-   ram->data[0xFFFC] = INS_LDA_ZP;
+   ram->data[0xFFFC] = LDA_ZP;
    ram->data[0xFFFD] = 0x42;
    ram->data[0x42] = 0x24;
    exec(&cpu, ram, 1);
@@ -110,7 +110,7 @@ static void testLDAZeroPageX(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
-   ram->data[0xFFFC] = INS_LDA_ZPX;
+   ram->data[0xFFFC] = LDA_ZPX;
    ram->data[0xFFFD] = 0x42;
    ram->data[0x52] = 0x70;
    exec(&cpu, ram, 1);
@@ -130,7 +130,7 @@ static void testLDAAbsolute(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
-   ram->data[0xFFFC] = INS_LDA_ABS;
+   ram->data[0xFFFC] = LDA_ABS;
    ram->data[0xFFFD] = 0x42;
    ram->data[0xFFFE] = 0x12;
    ram->data[0x1242] = 0x15;
@@ -151,7 +151,7 @@ static void testLDAAbsoluteX(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
-   ram->data[0xFFFC] = INS_LDA_ABSX;
+   ram->data[0xFFFC] = LDA_ABSX;
    ram->data[0xFFFD] = 0x42;
    ram->data[0xFFFE] = 0x12;
    ram->data[0x1252] = 0x15;
@@ -172,7 +172,7 @@ static void testLDAAbsoluteY(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.y = 0x10;
-   ram->data[0xFFFC] = INS_LDA_ABSY;
+   ram->data[0xFFFC] = LDA_ABSY;
    ram->data[0xFFFD] = 0x42;
    ram->data[0xFFFE] = 0x12;
    ram->data[0x1252] = 0x15;
@@ -193,7 +193,7 @@ static void testLDAIndirectX(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
-   ram->data[0xFFFC] = INS_LDA_INDX;
+   ram->data[0xFFFC] = LDA_INDX;
    ram->data[0xFFFD] = 0x42;
    ram->data[0x52] = 0x15;
    ram->data[0x53] = 0x16;
@@ -216,7 +216,7 @@ static void testLDAIndirectY(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.y = 0x10;
-   ram->data[0xFFFC] = INS_LDA_INDY;
+   ram->data[0xFFFC] = LDA_INDY;
    ram->data[0xFFFD] = 0x42;
    ram->data[0x42] = 0x15;
    ram->data[0x43] = 0x16;
@@ -238,7 +238,7 @@ static void testLDXImmediate(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
-   ram->data[0xFFFC] = INS_LDX_IM;
+   ram->data[0xFFFC] = LDX_IM;
    ram->data[0xFFFD] = 0x42;
    exec(&cpu, ram, 1);
 
@@ -256,7 +256,7 @@ static void testLDXZeroPage(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
-   ram->data[0xFFFC] = INS_LDX_ZP;
+   ram->data[0xFFFC] = LDX_ZP;
    ram->data[0xFFFD] = 0x42;
    ram->data[0x42] = 0x24;
    exec(&cpu, ram, 1);
@@ -276,7 +276,7 @@ static void testLDXZeroPageY(void) {
    resetCPU(&cpu, 0xFFFC);
    
    cpu.y = 0x10;
-   ram->data[0xFFFC] = INS_LDX_ZPY;
+   ram->data[0xFFFC] = LDX_ZPY;
    ram->data[0xFFFD] = 0x42;
    ram->data[0x52] = 0x24;
    exec(&cpu, ram, 1);
@@ -295,7 +295,7 @@ static void testLDXAbsolute(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
-   ram->data[0xFFFC] = INS_LDX_ABS;
+   ram->data[0xFFFC] = LDX_ABS;
    ram->data[0xFFFD] = 0x42;
    ram->data[0xFFFE] = 0x12;
    ram->data[0x1242] = 0x15;
@@ -317,7 +317,7 @@ static void testLDXAbsoluteY(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.y = 0x10;
-   ram->data[0xFFFC] = INS_LDX_ABSY;
+   ram->data[0xFFFC] = LDX_ABSY;
    ram->data[0xFFFD] = 0x42;
    ram->data[0xFFFE] = 0x12;
    ram->data[0x1252] = 0x15;
@@ -338,7 +338,7 @@ static void testLDYImmediate(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    
-   ram->data[0xFFFC] = INS_LDY_IM;
+   ram->data[0xFFFC] = LDY_IM;
    ram->data[0xFFFD] = 0x42;
    exec(&cpu, ram, 1);
 
@@ -357,7 +357,7 @@ static void testLDYZeroPage(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
-   ram->data[0xFFFC] = INS_LDY_ZP;
+   ram->data[0xFFFC] = LDY_ZP;
    ram->data[0xFFFD] = 0x42;
    ram->data[0x42] = 0x24;
    exec(&cpu, ram, 1);
@@ -378,7 +378,7 @@ static void testLDYZeroPageX(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
-   ram->data[0xFFFC] = INS_LDY_ZPX;
+   ram->data[0xFFFC] = LDY_ZPX;
    ram->data[0xFFFD] = 0x42;
    ram->data[0x52] = 0x24;
    exec(&cpu, ram, 1);
@@ -398,7 +398,7 @@ static void testLDYAbsolute(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
-   ram->data[0xFFFC] = INS_LDY_ABS;
+   ram->data[0xFFFC] = LDY_ABS;
    ram->data[0xFFFD] = 0x42;
    ram->data[0xFFFE] = 0x12;
    ram->data[0x1242] = 0x15;
@@ -420,7 +420,7 @@ static void testLDYAbsoluteX(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
-   ram->data[0xFFFC] = INS_LDY_ABSX;
+   ram->data[0xFFFC] = LDY_ABSX;
    ram->data[0xFFFD] = 0x42;
    ram->data[0xFFFE] = 0x12;
    ram->data[0x1252] = 0x15;
@@ -442,7 +442,7 @@ static void testSTAZeroPage(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
-   ram->data[0xFFFC] = INS_STA_ZP;
+   ram->data[0xFFFC] = STA_ZP;
    ram->data[0xFFFD] = 0x54;
    exec(&cpu, ram, 1);
 
@@ -461,7 +461,7 @@ static void testSTAZeroPageX(void) {
 
    cpu.a = 0x42;
    cpu.x = 0x24;
-   ram->data[0xFFFC] = INS_STA_ZPX;
+   ram->data[0xFFFC] = STA_ZPX;
    ram->data[0xFFFD] = 0x54;
    exec(&cpu, ram, 1);
 
@@ -479,7 +479,7 @@ static void testSTAAbsolute(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
-   ram->data[0xFFFC] = INS_STA_ABS;
+   ram->data[0xFFFC] = STA_ABS;
    ram->data[0xFFFD] = 0x33;
    ram->data[0xFFFE] = 0x22;
    exec(&cpu, ram, 1);
@@ -499,7 +499,7 @@ static void testSTAAbsoluteX(void) {
 
    cpu.a = 0x42;
    cpu.x = 0x10;
-   ram->data[0xFFFC] = INS_STA_ABSX;
+   ram->data[0xFFFC] = STA_ABSX;
    ram->data[0xFFFD] = 0x33;
    ram->data[0xFFFE] = 0x22;
    exec(&cpu, ram, 1);
@@ -519,7 +519,7 @@ static void testSTAAbsoluteY(void) {
 
    cpu.a = 0x42;
    cpu.y = 0x10;
-   ram->data[0xFFFC] = INS_STA_ABSY;
+   ram->data[0xFFFC] = STA_ABSY;
    ram->data[0xFFFD] = 0x33;
    ram->data[0xFFFE] = 0x22;
    exec(&cpu, ram, 1);
@@ -539,7 +539,7 @@ static void testSTAIndirectX(void) {
 
    cpu.a = 0x42;
    cpu.x = 0x10;
-   ram->data[0xFFFC] = INS_STA_INDX;
+   ram->data[0xFFFC] = STA_INDX;
    ram->data[0xFFFD] = 0x24;
    ram->data[0x34] = 0x40;
    ram->data[0x35] = 0x89;
@@ -560,7 +560,7 @@ static void testSTAIndirectY(void) {
 
    cpu.a = 0x42;
    cpu.y = 0x10;
-   ram->data[0xFFFC] = INS_STA_INDY;
+   ram->data[0xFFFC] = STA_INDY;
    ram->data[0xFFFD] = 0x12;
    ram->data[0x12] = 0x14;
    ram->data[0x13] = 0xD2;
@@ -580,7 +580,7 @@ static void testSTXZeroPage(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x42;
-   ram->data[0xFFFC] = INS_STX_ZP;
+   ram->data[0xFFFC] = STX_ZP;
    ram->data[0xFFFD] = 0x34;
    exec(&cpu, ram, 1);
 
@@ -599,7 +599,7 @@ static void testSTXZeroPageY(void) {
 
    cpu.x = 0x42;
    cpu.y = 0x10;
-   ram->data[0xFFFC] = INS_STX_ZPY;
+   ram->data[0xFFFC] = STX_ZPY;
    ram->data[0xFFFD] = 0x34;
    exec(&cpu, ram, 1);
 
@@ -617,7 +617,7 @@ static void testSTXAbsolute(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x42;
-   ram->data[0xFFFC] = INS_STX_ABS;
+   ram->data[0xFFFC] = STX_ABS;
    ram->data[0xFFFD] = 0x34;
    ram->data[0xFFFE] = 0x24;
    exec(&cpu, ram, 1);
@@ -636,7 +636,7 @@ static void testSTYZeroPage(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.y = 0x42;
-   ram->data[0xFFFC] = INS_STY_ZP;
+   ram->data[0xFFFC] = STY_ZP;
    ram->data[0xFFFD] = 0x34;
    exec(&cpu, ram, 1);
 
@@ -655,7 +655,7 @@ static void testSTYZeroPageX(void) {
 
    cpu.x = 0x42;
    cpu.y = 0x10;
-   ram->data[0xFFFC] = INS_STY_ZPX;
+   ram->data[0xFFFC] = STY_ZPX;
    ram->data[0xFFFD] = 0x34;
    exec(&cpu, ram, 1);
 
@@ -673,7 +673,7 @@ static void testSTYAbsolute(void) {
    resetCPU(&cpu, 0xFFFC);
 
    cpu.y = 0x42;
-   ram->data[0xFFFC] = INS_STY_ABS;
+   ram->data[0xFFFC] = STY_ABS;
    ram->data[0xFFFD] = 0x34;
    ram->data[0xFFFE] = 0x24;
    exec(&cpu, ram, 1);
@@ -692,7 +692,7 @@ static void testTAX(void) {
    RAM* ram = initRAM();
 
    cpu.a = 0x42;
-   ram->data[0xFFFC] = INS_TAX;
+   ram->data[0xFFFC] = TAX;
    exec(&cpu, ram, 1);
 
    ASSERT_EQUAL(cpu.a, cpu.x, "X");
@@ -709,7 +709,7 @@ static void testTXA(void) {
    RAM* ram = initRAM();
 
    cpu.x = 0x42;
-   ram->data[0xFFFC] = INS_TXA;
+   ram->data[0xFFFC] = TXA;
    exec(&cpu, ram, 1);
 
    ASSERT_EQUAL(cpu.x, cpu.a, "A");
@@ -726,7 +726,7 @@ static void testTAY(void) {
    RAM* ram = initRAM();
 
    cpu.a = 0x42;
-   ram->data[0xFFFC] = INS_TAY;
+   ram->data[0xFFFC] = TAY;
    exec(&cpu, ram, 1);
 
    ASSERT_EQUAL(cpu.a, cpu.y, "Y");
@@ -743,7 +743,7 @@ static void testTYA(void) {
    RAM* ram = initRAM();
 
    cpu.y = 0xBE;
-   ram->data[0xFFFC] = INS_TYA;
+   ram->data[0xFFFC] = TYA;
    exec(&cpu, ram, 1);
 
    ASSERT_EQUAL(cpu.y, cpu.a, "A");
@@ -767,7 +767,7 @@ static void testTSX(void) {
    RAM* ram = initRAM();
 
    cpu.sp = 0x42;
-   ram->data[0xFFFC] = INS_TSX;
+   ram->data[0xFFFC] = TSX;
    exec(&cpu, ram, 1);
 
    ASSERT_EQUAL(0x42, cpu.x, "X");
@@ -791,7 +791,7 @@ static void testTXS(void) {
    RAM* ram = initRAM();
    
    cpu.x = 0x42;
-   ram->data[0xFFFC] = INS_TXS;
+   ram->data[0xFFFC] = TXS;
    exec(&cpu, ram, 1);
 
    ASSERT_EQUAL(0x42, cpu.x, "X");
@@ -815,7 +815,7 @@ static void testPHA(void) {
    RAM* ram = initRAM();
 
    cpu.a = 0x42;
-   ram->data[0xFFFC] = INS_PHA;
+   ram->data[0xFFFC] = PHA;
  
    exec(&cpu, ram, 1);
 
@@ -839,9 +839,9 @@ static void testPHP(void) {
    resetCPU(&cpu, 0xFFFC);
    RAM* ram = initRAM();
 
-   ram->data[0xFFFC] = INS_LDA_IM;
+   ram->data[0xFFFC] = LDA_IM;
    ram->data[0xFFFD] = 0xBE;
-   ram->data[0xFFFE] = INS_PHP;
+   ram->data[0xFFFE] = PHP;
    exec(&cpu, ram, 2);
    
    ASSERT_EQUAL(0x01FE, cpu.sp, "SP");
@@ -867,7 +867,7 @@ static void testPLA(void) {
    
    cpu.sp = 0x01FE;
    ram->data[0x01FE] = 0x42;
-   ram->data[0xFFFC] = INS_PLA;
+   ram->data[0xFFFC] = PLA;
    exec(&cpu, ram, 1);
 
    ASSERT_EQUAL(0x01FF, cpu.sp, "SP");
@@ -893,7 +893,7 @@ static void testPLP(void) {
 
    cpu.sp = 0x01FE;
    ram->data[0x01FE] = 0x81;
-   ram->data[0xFFFC] = INS_PLP;
+   ram->data[0xFFFC] = PLP;
    exec(&cpu, ram, 1);
 
    ASSERT_EQUAL(0x01FF, cpu.sp, "SP");
@@ -918,7 +918,7 @@ static void testANDImmediate(void) {
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
-   ram->data[0xFFFC] = INS_AND_IM;
+   ram->data[0xFFFC] = AND_IM;
    ram->data[0xFFFD] = 0x42;
    exec(&cpu, ram, 1);
 
@@ -945,7 +945,7 @@ static void testANDZeroPage(void) {
    cpu.a = 0x24;
 
    ram->data[0x0001] = 0x42;
-   ram->data[0xFFFC] = INS_AND_ZP;
+   ram->data[0xFFFC] = AND_ZP;
    ram->data[0xFFFD] = 0x1;
    exec(&cpu, ram, 1);
 
@@ -973,7 +973,7 @@ static void testANDZeroPageX(void) {
    cpu.x = 0x10;
    
    ram->data[0x0011] = 0x42;
-   ram->data[0xFFFC] = INS_AND_ZPX;
+   ram->data[0xFFFC] = AND_ZPX;
    ram->data[0xFFFD] = 0x1;
    exec(&cpu, ram, 1);
 
@@ -999,7 +999,7 @@ static void testANDAbsolute(void) {
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
-   ram->data[0xFFFC] = INS_AND_ABS;
+   ram->data[0xFFFC] = AND_ABS;
    ram->data[0xFFFD] = 0x53;
    ram->data[0xFFFE] = 0xA4;
    ram->data[0xA453] = 0x42;
@@ -1028,7 +1028,7 @@ static void testANDAbsoluteX(void) {
    cpu.a = 0x24;
    cpu.x = 0x10;
 
-   ram->data[0xFFFC] = INS_AND_ABSX;
+   ram->data[0xFFFC] = AND_ABSX;
    ram->data[0xFFFD] = 0x53;
    ram->data[0xFFFE] = 0xA4;
    ram->data[0xA463] = 0x42;
@@ -1057,7 +1057,7 @@ static void testANDAbsoluteY(void) {
    cpu.a = 0x24;
    cpu.y = 0x10;
 
-   ram->data[0xFFFC] = INS_AND_ABSY;
+   ram->data[0xFFFC] = AND_ABSY;
    ram->data[0xFFFD] = 0x53;
    ram->data[0xFFFE] = 0xA4;
    ram->data[0xA463] = 0x42;
@@ -1086,7 +1086,7 @@ static void testANDIndirectX(void) {
 
    cpu.a = 0x42;
    cpu.x = 0x10;
-   ram->data[0xFFFC] = INS_AND_INDX;
+   ram->data[0xFFFC] = AND_INDX;
    ram->data[0xFFFD] = 0x24;
    ram->data[0x34] = 0x40;
    ram->data[0x35] = 0x89;
@@ -1116,7 +1116,7 @@ static void testANDIndirectY(void) {
 
    cpu.a = 0x42;
    cpu.y = 0x10;
-   ram->data[0xFFFC] = INS_AND_INDY;
+   ram->data[0xFFFC] = AND_INDY;
    ram->data[0xFFFD] = 0x24;
    ram->data[0x24] = 0x40;
    ram->data[0x25] = 0x89;
@@ -1144,11 +1144,11 @@ static void testADCImmediate(void) {
    RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFF3);
 
-   ram->data[0xFFF3] = INS_LDA_IM;
+   ram->data[0xFFF3] = LDA_IM;
    ram->data[0xFFF4] = 0x42;
-   ram->data[0xFFF5] = INS_ADC_IM;
+   ram->data[0xFFF5] = ADC_IM;
    ram->data[0xFFF6] = 0x22;
-   ram->data[0xFFF7] = INS_ADC_IM;
+   ram->data[0xFFF7] = ADC_IM;
    ram->data[0xFFF8] = 0x42;
    exec(&cpu, ram, 3);
 
