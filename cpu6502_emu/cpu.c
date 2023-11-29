@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define EMPTY_ADDR 0x0
+
 #pragma region Memory helpers
 
 static byte readByteFromAddr(word addr, const RAM* ram, u32* cycles) {
@@ -198,6 +200,26 @@ static void setCVFlags(CPU* cpu, word sum, byte op) {
 
 #pragma endregion
 
+#pragma region Instruction helpers
+
+static void ldIns(CPU* cpu, const RAM* ram, byte* reg, word valAddr) {
+   byte val = EMPTY_ADDR == valAddr 
+      ? readByteFromPC(&cpu->pc, ram, &cpu->cycles) 
+      : readByteFromAddr(valAddr, ram, &cpu->cycles);
+   (*reg) = val;
+   setZNFlags(cpu, *reg);
+}
+
+static void andIns(CPU* cpu, const RAM* ram, word valAddr) {
+   byte val = EMPTY_ADDR == valAddr
+      ? readByteFromPC(&cpu->pc, ram, &cpu->cycles)
+      : readByteFromAddr(valAddr, ram, &cpu->cycles);
+   cpu->a &= val;
+   setZNFlags(cpu, cpu->a);
+}
+
+#pragma endregion
+
 #pragma region Instruction handlers
 
 static void jsr(CPU* cpu, RAM* ram) { //takes 1 cycle to fetch op code
@@ -222,111 +244,90 @@ static void adcImmediate(CPU* cpu, const RAM* ram) {
 }
 
 static void ldaImmediate(CPU* cpu, const RAM* ram) {
-   byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
-   cpu->a = val;
-   setZNFlags(cpu, cpu->a);
+   ldIns(cpu, ram, &cpu->a, EMPTY_ADDR);
 }
 
 static void ldaZeroPage(CPU* cpu, const RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
-   cpu->a = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->a);
+   ldIns(cpu, ram, &cpu->a, addr);
 }
 
 static void ldaZeroPageX(CPU* cpu, const RAM* ram) {
    byte addr = zpAddr(cpu, ram, X);
-   cpu->a = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->a);
+   ldIns(cpu, ram, &cpu->a, addr);
 }
 
 static void ldaAbsolute(CPU* cpu, const RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
-   cpu->a = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->a);
+   ldIns(cpu, ram, &cpu->a, addr);
 }
 
 static void ldaAbsoluteX(CPU* cpu, const RAM* ram) {
    word addr = absAddr(cpu, ram, X, true);
-   cpu->a = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->a);
+   ldIns(cpu, ram, &cpu->a, addr);
 }
 
 static void ldaAbsoluteY(CPU* cpu, const RAM* ram) {
    word addr = absAddr(cpu, ram, Y, true);
-   cpu->a = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->a);
+   ldIns(cpu, ram, &cpu->a, addr);
 }
 
 static void ldaIndirectX(CPU* cpu, const RAM* ram) {
    word addr = indAddr(cpu, ram, X, false);   
-   cpu->a = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->a);
+   ldIns(cpu, ram, &cpu->a, addr);
 }
 
 static void ldaIndirectY(CPU* cpu, const RAM* ram) {
    word addr = indAddr(cpu, ram, Y, true);
-   cpu->a = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->a);
+   ldIns(cpu, ram, &cpu->a, addr);
 }
 
 static void ldxImmediate(CPU* cpu, const RAM* ram) {
-   byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
-   cpu->x = val;
-   setZNFlags(cpu, cpu->x);
+   ldIns(cpu, ram, &cpu->x, EMPTY_ADDR);
 }
 
 static void ldxZeroPage(CPU* cpu, const RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
-   cpu->x = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->x);
+   ldIns(cpu, ram, &cpu->x, addr);
 }
 
 static void ldxZeroPageY(CPU* cpu, const RAM* ram) {
    byte addr = zpAddr(cpu, ram, Y);
-   cpu->x = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->x);
+   ldIns(cpu, ram, &cpu->x, addr);
 }
 
 static void ldxAbsolute(CPU* cpu, const RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
-   cpu->x = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->x);
+   ldIns(cpu, ram, &cpu->x, addr);
 }
 
 static void ldxAbsoluteY(CPU* cpu, const RAM* ram) {
    word addr = absAddr(cpu, ram, Y, true);
-   cpu->x = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->x);
+   ldIns(cpu, ram, &cpu->x, addr);
 }
 
 static void ldyImmediate(CPU* cpu, const RAM* ram) {
-   byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
-   cpu->y = val;
-   setZNFlags(cpu, cpu->y);
+   ldIns(cpu, ram, &cpu->y, EMPTY_ADDR);
 }
 
 static void ldyZeroPage(CPU* cpu, const RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
-   cpu->y = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->y);
+   ldIns(cpu, ram, &cpu->y, addr);
 }
 
 static void ldyZeroPageX(CPU* cpu, const RAM* ram) {
    byte addr = zpAddr(cpu, ram, X);
-   cpu->y = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->y);
+   ldIns(cpu, ram, &cpu->y, addr);
 }
 
 static void ldyAbsolute(CPU* cpu, const RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
-   cpu->y = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->y);
+   ldIns(cpu, ram, &cpu->y, addr);
 }
 
 static void ldyAbsoluteX(CPU* cpu, const RAM* ram) {
    word addr = absAddr(cpu, ram, X, true);
-   cpu->y = readByteFromAddr(addr, ram, &cpu->cycles);
-   setZNFlags(cpu, cpu->y);
+   ldIns(cpu, ram, &cpu->y, addr);
 }
 
 static void staZeroPage(CPU* cpu, RAM* ram) {
@@ -335,14 +336,12 @@ static void staZeroPage(CPU* cpu, RAM* ram) {
 }
 
 static void staZeroPageX(CPU* cpu, RAM* ram) {
-   byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
-   byte effAddr = (zpAddr + cpu->x) & 0xFF;
-   cpu->cycles++;
-   writeByteToMemory(cpu->a, effAddr, ram, &cpu->cycles);
+   word addr = zpAddr(cpu, ram, X);
+   writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
 }
 
 static void staAbsolute(CPU* cpu, RAM* ram) {
-   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+   word addr = absAddr(cpu, ram, NONE, false);
    writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
 }
 
@@ -475,6 +474,45 @@ static void plp(CPU* cpu, const RAM* ram) {
    cpu->cycles++;
 }
 
+static void andImmediate(CPU* cpu, const RAM* ram) {
+   andIns(cpu, ram, EMPTY_ADDR);
+}
+
+static void andZeroPage(CPU* cpu, const RAM* ram) {
+   byte addr = zpAddr(cpu, ram, NONE);
+   andIns(cpu, ram, addr);
+}
+
+static void andZeroPageX(CPU* cpu, const RAM* ram) {
+   byte addr = zpAddr(cpu, ram, X);
+   andIns(cpu, ram, addr);
+}
+
+static void andAbsolute(CPU* cpu, const RAM* ram) {
+   word addr = absAddr(cpu, ram, NONE, false);
+   andIns(cpu, ram, addr);
+}
+
+static void andAbsoluteX(CPU* cpu, const RAM* ram) {
+   word addr = absAddr(cpu, ram, X, true);
+   andIns(cpu, ram, addr);
+}
+
+static void andAbsoluteY(CPU* cpu, const RAM* ram) {
+   word addr = absAddr(cpu, ram, Y, true);
+   andIns(cpu, ram, addr);
+}
+
+static void andIndirectX(CPU* cpu, const RAM* ram) {
+   word addr = indAddr(cpu, ram, X, false);
+   andIns(cpu, ram, addr);
+}
+
+static void andIndirectY(CPU* cpu, const RAM* ram) {
+   word addr = indAddr(cpu, ram, Y, true);
+   andIns(cpu, ram, addr);
+}
+
 #pragma endregion
 
 //Instruction map.
@@ -523,6 +561,14 @@ void(*insTable[256])(CPU* cpu, RAM* ram) = {
    [INS_PHP] = &php,
    [INS_PLA] = &pla,
    [INS_PLP] = &plp,
+   [INS_AND_IM] = &andImmediate,
+   [INS_AND_ZP] = &andZeroPage,
+   [INS_AND_ZPX] = &andZeroPageX,
+   [INS_AND_ABS] = &andAbsolute,
+   [INS_AND_ABSX] = &andAbsoluteX,
+   [INS_AND_ABSY] = &andAbsoluteY,
+   [INS_AND_INDX] = &andIndirectX,
+   [INS_AND_INDY] = &andIndirectY,
 };
 
 RAM* initRAM() {

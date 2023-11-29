@@ -74,6 +74,18 @@
 #define INS_PLP 0x28       //Pull Processor Status. Takes 4 cycles.
 
 #pragma endregion
+#pragma region LOGICAL
+
+#define INS_AND_IM 0x29    //AND Immediate. Takes 2 cycles.
+#define INS_AND_ZP 0x25    //AND Zero Page. Takes 3 cycles.
+#define INS_AND_ZPX 0x35   //AND Zero Page X. Takes 4 cycles.
+#define INS_AND_ABS 0x2D   //AND Absolute. Takes 4 cycles.
+#define INS_AND_ABSX 0x3D  //AND Absolute X. Takes 4(+1) cycles.
+#define INS_AND_ABSY 0x39  //AND Absolute Y. Takes 4(+1) cycles.
+#define INS_AND_INDX 0x21  //AND Indirect X. Takes 6 cycles.
+#define INS_AND_INDY 0x31  //AND Indirect Y. Takes 5(+1) cycles.
+
+#pragma endregion
 
 typedef unsigned char byte;
 typedef unsigned short word;
