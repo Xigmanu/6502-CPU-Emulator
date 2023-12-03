@@ -202,6 +202,12 @@ static void setCVFlags(CPU* cpu, word sum, byte op) {
 
 #pragma region Instruction helpers
 
+typedef enum {
+   AND,
+   EOR,
+   ORA
+} LogIns;
+
 static void ldIns(CPU* cpu, const RAM* ram, byte* reg, word valAddr) {
    byte val = EMPTY_ADDR == valAddr 
       ? readByteFromPC(&cpu->pc, ram, &cpu->cycles) 
@@ -210,11 +216,24 @@ static void ldIns(CPU* cpu, const RAM* ram, byte* reg, word valAddr) {
    setZNFlags(cpu, *reg);
 }
 
-static void andIns(CPU* cpu, const RAM* ram, word valAddr) {
+static void logIns(CPU* cpu, const RAM* ram, word valAddr, LogIns ins) {
    byte val = EMPTY_ADDR == valAddr
       ? readByteFromPC(&cpu->pc, ram, &cpu->cycles)
       : readByteFromAddr(valAddr, ram, &cpu->cycles);
-   cpu->a &= val;
+   
+   switch (ins)
+   {
+   case AND: 
+      cpu->a &= val;
+      break;
+   case EOR:
+      cpu->a ^= val;
+      break;
+   case ORA:
+      cpu->a |= val;
+      break;
+   }
+
    setZNFlags(cpu, cpu->a);
 }
 
@@ -475,43 +494,83 @@ static void plp(CPU* cpu, const RAM* ram) {
 }
 
 static void andImmediate(CPU* cpu, const RAM* ram) {
-   andIns(cpu, ram, EMPTY_ADDR);
+   logIns(cpu, ram, EMPTY_ADDR, AND);
 }
 
 static void andZeroPage(CPU* cpu, const RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
-   andIns(cpu, ram, addr);
+   logIns(cpu, ram, addr, AND);
 }
 
 static void andZeroPageX(CPU* cpu, const RAM* ram) {
    byte addr = zpAddr(cpu, ram, X);
-   andIns(cpu, ram, addr);
+   logIns(cpu, ram, addr, AND);
 }
 
 static void andAbsolute(CPU* cpu, const RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
-   andIns(cpu, ram, addr);
+   logIns(cpu, ram, addr, AND);
 }
 
 static void andAbsoluteX(CPU* cpu, const RAM* ram) {
    word addr = absAddr(cpu, ram, X, true);
-   andIns(cpu, ram, addr);
+   logIns(cpu, ram, addr, AND);
 }
 
 static void andAbsoluteY(CPU* cpu, const RAM* ram) {
    word addr = absAddr(cpu, ram, Y, true);
-   andIns(cpu, ram, addr);
+   logIns(cpu, ram, addr, AND);
 }
 
 static void andIndirectX(CPU* cpu, const RAM* ram) {
    word addr = indAddr(cpu, ram, X, false);
-   andIns(cpu, ram, addr);
+   logIns(cpu, ram, addr, AND);
 }
 
 static void andIndirectY(CPU* cpu, const RAM* ram) {
    word addr = indAddr(cpu, ram, Y, true);
-   andIns(cpu, ram, addr);
+   logIns(cpu, ram, addr, AND);
 }
+
+static void eorImmediate(CPU* cpu, const RAM* ram) {
+   logIns(cpu, ram, EMPTY_ADDR, EOR);
+}
+
+static void eorZeroPage(CPU* cpu, const RAM* ram) {
+   byte addr = zpAddr(cpu, ram, NONE);
+   logIns(cpu, ram, addr, EOR);
+}
+
+static void eorZeroPageX(CPU* cpu, const RAM* ram) {
+   byte addr = zpAddr(cpu, ram, X);
+   logIns(cpu, ram, addr, EOR);
+}
+
+static void eorAbsolute(CPU* cpu, const RAM* ram) {
+   word addr = absAddr(cpu, ram, NONE, false);
+   logIns(cpu, ram, addr, EOR);
+}
+
+static void eorAbsoluteX(CPU* cpu, const RAM* ram) {
+   word addr = absAddr(cpu, ram, X, true);
+   logIns(cpu, ram, addr, EOR);
+}
+
+static void eorAbsoluteY(CPU* cpu, const RAM* ram) {
+   word addr = absAddr(cpu, ram, Y, true);
+   logIns(cpu, ram, addr, EOR);
+}
+
+static void eorIndirectX(CPU* cpu, const RAM* ram) {
+   word addr = indAddr(cpu, ram, X, false);
+   logIns(cpu, ram, addr, EOR);
+}
+
+static void eorIndirectY(CPU* cpu, const RAM* ram) {
+   word addr = indAddr(cpu, ram, Y, true);
+   logIns(cpu, ram, addr, EOR);
+}
+
 
 #pragma endregion
 
@@ -569,6 +628,14 @@ void(*insTable[256])(CPU* cpu, RAM* ram) = {
    [AND_ABSY] = &andAbsoluteY,
    [AND_INDX] = &andIndirectX,
    [AND_INDY] = &andIndirectY,
+   [EOR_IM] = &eorImmediate,
+   [EOR_ZP] = &eorZeroPage,
+   [EOR_ZPX] = &eorZeroPageX,
+   [EOR_ABS] = &eorAbsolute,
+   [EOR_ABSX] = &eorAbsoluteX,
+   [EOR_ABSY] = &eorAbsoluteY,
+   [EOR_INDX] = &eorIndirectX,
+   [EOR_INDY] = &eorIndirectY,
 };
 
 RAM* initRAM() {
