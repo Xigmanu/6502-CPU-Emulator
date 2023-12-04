@@ -7,7 +7,9 @@
 #define MEM_MAX 65536   //(64 * 1024)
 #define JSR 0x20        //Jump to Subroutine. Takes 6 cycles.
 #define RTS 0x60        //Returns to the calling routine. Takes 6 cycles.
+
 #pragma region ADC
+
 #define ADC_IM 0x69     //ADC Immediate. Takes 2 cycles.
 #define ADC_ZP 0x65     //ADC Zero Page. Takes 3 cycles
 #define ADC_ZPX 0x75    //ADC Zero Page X. Takes 4 cycles.
@@ -16,8 +18,10 @@
 #define ADC_ABSY 0xB9   //ADC Absolute Y. Takes 4(+1) cycles
 #define ADC_INDX 0xA1   //ADC Indirect X. Takes 6 cycles.
 #define ADC_INDY 0xB1   //ADC Indirect Y. Takes 5(+1) cycles.
+
 #pragma endregion
 #pragma region LD_OPCODES
+
 #define LDA_IM 0xA9     //LDA Immediate. Takes 2 cycles.
 #define LDA_ZP 0xA5     //LDA Zero page. Takes 3 cycles.
 #define LDA_ZPX 0xB5    //LDA Zero page X. Takes 4 cycles.
@@ -93,6 +97,15 @@
 #define EOR_ABSY 0x59   //EOR Absolute Y. Takes 4(+1) cycles.
 #define EOR_INDX 0x41   //EOR Indirect X. Takes 6 cycles.
 #define EOR_INDY 0x51   //EOR Indirect Y. Takes 5(+1) cycles.
+
+#define ORA_IM 0x09     //ORA Immediate. Takes 2 cycles.
+#define ORA_ZP 0x05     //ORA Zero page. Takes 3 cycles.
+#define ORA_ZPX 0x15    //ORA Zero Page X. Takes 4 cycles.
+#define ORA_ABS 0x0D    //ORA Absolute. Takes 4 cycles.
+#define ORA_ABSX 0x1D   //ORA Absolute X. Takes 4(+1) cycles.
+#define ORA_ABSY 0x19   //ORA Absolute Y. Takes 4(+1) cycles.
+#define ORA_INDX 0x01   //ORA Indirect X. Takes 6 cycles.
+#define ORA_INDY 0x11   //ORA Indirect Y. Takes 5(+1) cycles.
 
 #pragma endregion
 

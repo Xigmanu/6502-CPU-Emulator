@@ -571,6 +571,44 @@ static void eorIndirectY(CPU* cpu, const RAM* ram) {
    logIns(cpu, ram, addr, EOR);
 }
 
+static void oraImmediate(CPU* cpu, const RAM* ram) {
+   logIns(cpu, ram, EMPTY_ADDR, ORA);
+}
+
+static void oraZeroPage(CPU* cpu, const RAM* ram) {
+   word addr = zpAddr(cpu, ram, NONE);
+   logIns(cpu, ram, addr, ORA);
+}
+
+static void oraZeroPageX(CPU* cpu, const RAM* ram) {
+   word addr = zpAddr(cpu, ram, X);
+   logIns(cpu, ram, addr, ORA);
+}
+
+static void oraAbsolute(CPU* cpu, const RAM* ram) {
+   word addr = absAddr(cpu, ram, NONE, false);
+   logIns(cpu, ram, addr, ORA);
+}
+
+static void oraAbsoluteX(CPU* cpu, const RAM* ram) {
+   word addr = absAddr(cpu, ram, X, true);
+   logIns(cpu, ram, addr, ORA);
+}
+
+static void oraAbsoluteY(CPU* cpu, const RAM* ram) {
+   word addr = absAddr(cpu, ram, Y, true);
+   logIns(cpu, ram, addr, ORA);
+}
+
+static void oraIndirectX(CPU* cpu, const RAM* ram) {
+   word addr = indAddr(cpu, ram, X, false);
+   logIns(cpu, ram, addr, ORA);
+}
+
+static void oraIndirectY(CPU* cpu, const RAM* ram) {
+   word addr = indAddr(cpu, ram, Y, true);
+   logIns(cpu, ram, addr, ORA);
+}
 
 #pragma endregion
 
@@ -636,6 +674,14 @@ void(*insTable[256])(CPU* cpu, RAM* ram) = {
    [EOR_ABSY] = &eorAbsoluteY,
    [EOR_INDX] = &eorIndirectX,
    [EOR_INDY] = &eorIndirectY,
+   [ORA_IM] = &oraImmediate,
+   [ORA_ZP] = &oraZeroPage,
+   [ORA_ZPX] = &oraZeroPageX,
+   [ORA_ABS] = &oraAbsolute,
+   [ORA_ABSX] = &oraAbsoluteX,
+   [ORA_ABSY] = &oraAbsoluteY,
+   [ORA_INDX] = &oraIndirectX,
+   [ORA_INDY] = &oraIndirectY,
 };
 
 RAM* initRAM() {
