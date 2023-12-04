@@ -188,10 +188,9 @@ static void setZNFlags(CPU* cpu, byte reg) {
    updatePS(cpu);
 }
 
-static void setCVFlags(CPU* cpu, word sum, byte op) {
-   setZNFlags(cpu, cpu->a);
+static void setCVFlags(CPU* cpu, word sum) {
    cpu->c = sum > 0xFF;
-   cpu->v = ((cpu->a ^ op) & 0x80) && ((cpu->a ^ sum) & 0x80);
+   cpu->v = (sum & 0x100) != 0;
 #ifdef _DEBUG
    printf("DEBUG\t| Set Flags: C: [0x%X], V: [0x%X]\n", cpu->c, cpu->v);
 #endif // _DEBUG
@@ -241,9 +240,9 @@ static void logIns(CPU* cpu, const RAM* ram, word valAddr, LogIns ins) {
 
 #pragma region Instruction handlers
 
-static void jsr(CPU* cpu, RAM* ram) { //takes 1 cycle to fetch op code
-   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles); // takes 2 cycles
-   pushWordToStack(ram, &cpu->sp, cpu->pc - 1, &cpu->cycles); // takes 4 cycles
+static void jsr(CPU* cpu, RAM* ram) {
+   word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
+   pushWordToStack(ram, &cpu->sp, cpu->pc - 1, &cpu->cycles);
 
    cpu->pc = addr;
    cpu->cycles++;
@@ -251,7 +250,7 @@ static void jsr(CPU* cpu, RAM* ram) { //takes 1 cycle to fetch op code
 
 static void rts(CPU* cpu, const RAM* ram) {
    word addr = popWordFromStack(ram, &cpu->sp, &cpu->cycles);
-   cpu->pc = addr + 1; //Not sure if correct but this is the only way program flow does not break.
+   cpu->pc = addr + 1;
    cpu->cycles += 2;
 }
 
@@ -259,7 +258,9 @@ static void adcImmediate(CPU* cpu, const RAM* ram) {
    byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
    word sum = cpu->a + val + cpu->c;
    cpu->a = (byte)sum;
-   setCVFlags(cpu, sum, val);
+
+   setZNFlags(cpu, cpu->a);
+   setCVFlags(cpu, sum);
 }
 
 static void ldaImmediate(CPU* cpu, const RAM* ram) {
@@ -610,6 +611,26 @@ static void oraIndirectY(CPU* cpu, const RAM* ram) {
    logIns(cpu, ram, addr, ORA);
 }
 
+static void bitZeroPage(CPU* cpu, const RAM* ram) {
+   word addr = zpAddr(cpu, ram, NONE);
+   byte val = readByteFromAddr(addr, ram, &cpu->cycles);
+
+   byte res = cpu->a & val;
+   setZNFlags(cpu, res);
+   cpu->v = (res & 0x6) != 0;
+   updatePS(cpu);
+}
+
+static void bitAbsolute(CPU* cpu, const RAM* ram) {
+   word addr = absAddr(cpu, ram, NONE, false);
+   byte val = readByteFromAddr(addr, ram, &cpu->cycles);
+
+   byte res = cpu->a & val;
+   setZNFlags(cpu, res);
+   cpu->v = (res & 0x6) != 0;
+   updatePS(cpu);
+}
+
 #pragma endregion
 
 //Instruction map.
@@ -682,6 +703,8 @@ void(*insTable[256])(CPU* cpu, RAM* ram) = {
    [ORA_ABSY] = &oraAbsoluteY,
    [ORA_INDX] = &oraIndirectX,
    [ORA_INDY] = &oraIndirectY,
+   [BIT_ZP] = &bitZeroPage,
+   [BIT_ABS] = &bitAbsolute,
 };
 
 RAM* initRAM() {

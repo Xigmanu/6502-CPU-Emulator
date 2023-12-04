@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "cpu.h"
 
-#define TEST_COUNT 68
+#define TEST_COUNT 70
 #define ASSERT_EQUAL(exp, got, argName) \
    do { \
       if ((exp) != (got)) { \

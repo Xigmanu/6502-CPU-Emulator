@@ -1592,6 +1592,61 @@ static void testORAIndirectY(void) {
    freeRAM(ram);
 }
 
+static void testBITZeroPage(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.a = 0xFF;
+   ram->data[0x0041] = 0xC3;
+   ram->data[0xFFFC] = BIT_ZP;
+   ram->data[0xFFFD] = 0x41;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
+   ASSERT_EQUAL(0xFF, cpu.a, "A");
+   ASSERT_EQUAL(0xC0, cpu.ps, "PS");
+   ASSERT_EQUAL(0x0, cpu.c, "C");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+   ASSERT_EQUAL(0x0, cpu.i, "I");
+   ASSERT_EQUAL(0x0, cpu.d, "D");
+   ASSERT_EQUAL(0x0, cpu.b, "B");
+   ASSERT_EQUAL(0x1, cpu.v, "V");
+   ASSERT_EQUAL(0x1, cpu.n, "N");
+   ASSERT_EQUAL(3, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
+static void testBITAbsolute(void) {
+   PRINT_TEST_NAME();
+   CPU cpu;
+   RAM* ram = initRAM();
+   resetCPU(&cpu, 0xFFFC);
+
+   cpu.a = 0xA5;
+   ram->data[0x5141] = 0xC3;
+   ram->data[0xFFFC] = BIT_ABS;
+   ram->data[0xFFFD] = 0x41;
+   ram->data[0xFFFE] = 0x51;
+   exec(&cpu, ram, 1);
+
+   ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
+   ASSERT_EQUAL(0xA5, cpu.a, "A");
+   ASSERT_EQUAL(0x80, cpu.ps, "PS");
+   ASSERT_EQUAL(0x0, cpu.c, "C");
+   ASSERT_EQUAL(0x0, cpu.z, "Z");
+   ASSERT_EQUAL(0x0, cpu.i, "I");
+   ASSERT_EQUAL(0x0, cpu.d, "D");
+   ASSERT_EQUAL(0x0, cpu.b, "B");
+   ASSERT_EQUAL(0x0, cpu.v, "V");
+   ASSERT_EQUAL(0x1, cpu.n, "N");
+   ASSERT_EQUAL(4, cpu.cycles, "Cycles");
+
+   freeRAM(ram);
+}
+
 void(*tests[])(void) = {
    &testResetCPU,
    &testJSR,
@@ -1662,6 +1717,8 @@ void(*tests[])(void) = {
    &testORAAbsoluteY,
    &testORAIndirectX,
    &testORAIndirectY,
+   &testBITZeroPage,
+   &testBITAbsolute
 };
 
 void runTests() {

@@ -22,42 +22,42 @@
 #pragma endregion
 #pragma region LD_OPCODES
 
-#define LDA_IM 0xA9     //LDA Immediate. Takes 2 cycles.
-#define LDA_ZP 0xA5     //LDA Zero page. Takes 3 cycles.
-#define LDA_ZPX 0xB5    //LDA Zero page X. Takes 4 cycles.
-#define LDA_ABS 0xAD    //LDA Absolute. Takes 4 cycles.
-#define LDA_ABSX 0xBD   //LDA Absolute X. Takes 4(+1) cycles.
-#define LDA_ABSY 0xB9   //LDA Absolute Y. Takes 4(+1) cycles
-#define LDA_INDX 0xA1   //LDA Indirect X. Takes 6 cycles.
-#define LDA_INDY 0xB1   //LDA Indirect Y. Takes 5(+1) cycles.
+#define LDA_IM 0xA9     //Load accumulator (Immediate). Takes 2 cycles.
+#define LDA_ZP 0xA5     //Load accumulator (Zero page). Takes 3 cycles.
+#define LDA_ZPX 0xB5    //Load accumulator (Zero page X). Takes 4 cycles.
+#define LDA_ABS 0xAD    //Load accumulator (Absolute). Takes 4 cycles.
+#define LDA_ABSX 0xBD   //Load accumulator (Absolute X). Takes 4(+1) cycles.
+#define LDA_ABSY 0xB9   //Load accumulator (Absolute Y). Takes 4(+1) cycles
+#define LDA_INDX 0xA1   //Load accumulator (Indirect X). Takes 6 cycles.
+#define LDA_INDY 0xB1   //Load accumulator (Indirect Y). Takes 5(+1) cycles.
 
-#define LDX_IM 0xA2     //LDX Immediate. Takes 2 cycles.
-#define LDX_ZP 0xA6     //LDX Zero page. Takes 3 cycles.
-#define LDX_ZPY 0xB6    //LDX Zero page Y. Takes 4 cycles.
-#define LDX_ABS 0xAE    //LDX Absolute. Takes 4 cycles.
-#define LDX_ABSY 0xBE   //LDX Absolute Y. Takes 4(+1) cycles   
+#define LDX_IM 0xA2     //Load X (Immediate). Takes 2 cycles.
+#define LDX_ZP 0xA6     //Load X (Zero page). Takes 3 cycles.
+#define LDX_ZPY 0xB6    //Load X (Zero page Y). Takes 4 cycles.
+#define LDX_ABS 0xAE    //Load X (Absolute). Takes 4 cycles.
+#define LDX_ABSY 0xBE   //Load X (Absolute Y). Takes 4(+1) cycles   
 
-#define LDY_IM 0xA0     //LDY Immediate. Takes 2 cycles.
-#define LDY_ZP 0xA4     //LDY Zero page. Takes 3 cycles.
-#define LDY_ZPX 0xB4    //LDY Zero page X. Takes 4 cycles.
-#define LDY_ABS 0xAC    //LDY Absolute. Takes 4 cycles.
-#define LDY_ABSX 0xBC   //LDY Absolute X. Takes 4(+1) cycles 
+#define LDY_IM 0xA0     //Load Y (Immediate). Takes 2 cycles.
+#define LDY_ZP 0xA4     //Load Y (Zero page). Takes 3 cycles.
+#define LDY_ZPX 0xB4    //Load Y (Zero page X). Takes 4 cycles.
+#define LDY_ABS 0xAC    //Load Y (Absolute). Takes 4 cycles.
+#define LDY_ABSX 0xBC   //Load Y (Absolute X). Takes 4(+1) cycles 
 
-#define STA_ZP 0x85     //STA Zero page. Takes 3 cycles.
-#define STA_ZPX 0x95    //STA Zero page X. Takes 4 cycles.
-#define STA_ABS 0x8D    //STA Absolute. Takes 4 cycles.
-#define STA_ABSX 0x9D   //STA Absolute X. Takes 5 cycles.
-#define STA_ABSY 0x99   //STA Absolute Y. Takes 5 cycles.
-#define STA_INDX 0x81   //STA Indirect X. Takes 6 cycles.
-#define STA_INDY 0x91   //STA Indirect Y. Takes 6 cycles.
+#define STA_ZP 0x85     //Store accumulator (Zero page). Takes 3 cycles.
+#define STA_ZPX 0x95    //Store accumulator (Zero page X). Takes 4 cycles.
+#define STA_ABS 0x8D    //Store accumulator (Absolute). Takes 4 cycles.
+#define STA_ABSX 0x9D   //Store accumulator (Absolute X). Takes 5 cycles.
+#define STA_ABSY 0x99   //Store accumulator (Absolute Y). Takes 5 cycles.
+#define STA_INDX 0x81   //Store accumulator (Indirect X). Takes 6 cycles.
+#define STA_INDY 0x91   //Store accumulator (Indirect Y). Takes 6 cycles.
 
-#define STX_ZP 0x86     //STX Zero page. Takes 3 cycles.
-#define STX_ZPY 0x96    //STX Zero page Y. Takes 4 cycles.
-#define STX_ABS 0x8E    //STX Absolute. Takes 4 cycles.
+#define STX_ZP 0x86     //Store X (Zero page). Takes 3 cycles.
+#define STX_ZPY 0x96    //Store X (Zero page Y). Takes 4 cycles.
+#define STX_ABS 0x8E    //Store X (Absolute). Takes 4 cycles.
 
-#define STY_ZP 0x84     //STY Zero page. Takes 3 cycles.
-#define STY_ZPX 0x94    //STY Zero page Y. Takes 4 cycles.
-#define STY_ABS 0x8C    //STY Absolute. Takes 4 cycles.
+#define STY_ZP 0x84     //Store Y (Zero page). Takes 3 cycles.
+#define STY_ZPX 0x94    //Store Y (Zero page Y). Takes 4 cycles.
+#define STY_ABS 0x8C    //Store Y (Absolute). Takes 4 cycles.
 
 #pragma endregion
 #pragma region REG_TRANSFERS
@@ -80,32 +80,35 @@
 #pragma endregion
 #pragma region LOGICAL
 
-#define AND_IM 0x29     //AND Immediate. Takes 2 cycles.
-#define AND_ZP 0x25     //AND Zero Page. Takes 3 cycles.
-#define AND_ZPX 0x35    //AND Zero Page X. Takes 4 cycles.
-#define AND_ABS 0x2D    //AND Absolute. Takes 4 cycles.
-#define AND_ABSX 0x3D   //AND Absolute X. Takes 4(+1) cycles.
-#define AND_ABSY 0x39   //AND Absolute Y. Takes 4(+1) cycles.
-#define AND_INDX 0x21   //AND Indirect X. Takes 6 cycles.
-#define AND_INDY 0x31   //AND Indirect Y. Takes 5(+1) cycles.
+#define AND_IM 0x29     //AND (Immediate). Takes 2 cycles.
+#define AND_ZP 0x25     //AND (Zero Page). Takes 3 cycles.
+#define AND_ZPX 0x35    //AND (Zero Page X). Takes 4 cycles.
+#define AND_ABS 0x2D    //AND (Absolute). Takes 4 cycles.
+#define AND_ABSX 0x3D   //AND (Absolute X). Takes 4(+1) cycles.
+#define AND_ABSY 0x39   //AND (Absolute Y). Takes 4(+1) cycles.
+#define AND_INDX 0x21   //AND (Indirect X). Takes 6 cycles.
+#define AND_INDY 0x31   //AND (Indirect Y). Takes 5(+1) cycles.
 
-#define EOR_IM 0x49     //EOR Immediate. Takes 2 cycles.
-#define EOR_ZP 0x45     //EOR Zero page. Takes 3 cycles.
-#define EOR_ZPX 0x55    //EOR Zero Page X. Takes 4 cycles.
-#define EOR_ABS 0x4D    //EOR Absolute. Takes 4 cycles.
-#define EOR_ABSX 0x5D   //EOR Absolute X. Takes 4(+1) cycles.
-#define EOR_ABSY 0x59   //EOR Absolute Y. Takes 4(+1) cycles.
-#define EOR_INDX 0x41   //EOR Indirect X. Takes 6 cycles.
-#define EOR_INDY 0x51   //EOR Indirect Y. Takes 5(+1) cycles.
+#define EOR_IM 0x49     //Exclusive OR (Immediate). Takes 2 cycles.
+#define EOR_ZP 0x45     //Exclusive OR (Zero page). Takes 3 cycles.
+#define EOR_ZPX 0x55    //Exclusive OR (Zero Page X). Takes 4 cycles.
+#define EOR_ABS 0x4D    //Exclusive OR (Absolute). Takes 4 cycles.
+#define EOR_ABSX 0x5D   //Exclusive OR (Absolute X). Takes 4(+1) cycles.
+#define EOR_ABSY 0x59   //Exclusive OR (Absolute Y). Takes 4(+1) cycles.
+#define EOR_INDX 0x41   //Exclusive OR (Indirect X). Takes 6 cycles.
+#define EOR_INDY 0x51   //Exclusive OR (Indirect Y). Takes 5(+1) cycles.
 
-#define ORA_IM 0x09     //ORA Immediate. Takes 2 cycles.
-#define ORA_ZP 0x05     //ORA Zero page. Takes 3 cycles.
-#define ORA_ZPX 0x15    //ORA Zero Page X. Takes 4 cycles.
-#define ORA_ABS 0x0D    //ORA Absolute. Takes 4 cycles.
-#define ORA_ABSX 0x1D   //ORA Absolute X. Takes 4(+1) cycles.
-#define ORA_ABSY 0x19   //ORA Absolute Y. Takes 4(+1) cycles.
-#define ORA_INDX 0x01   //ORA Indirect X. Takes 6 cycles.
-#define ORA_INDY 0x11   //ORA Indirect Y. Takes 5(+1) cycles.
+#define ORA_IM 0x09     //Inclusive OR (Immediate). Takes 2 cycles.
+#define ORA_ZP 0x05     //Inclusive OR (Zero page). Takes 3 cycles.
+#define ORA_ZPX 0x15    //Inclusive OR (Zero Page X). Takes 4 cycles.
+#define ORA_ABS 0x0D    //Inclusive OR (Absolute). Takes 4 cycles.
+#define ORA_ABSX 0x1D   //Inclusive OR (Absolute X). Takes 4(+1) cycles.
+#define ORA_ABSY 0x19   //Inclusive OR (Absolute Y). Takes 4(+1) cycles.
+#define ORA_INDX 0x01   //Inclusive OR (Indirect X). Takes 6 cycles.
+#define ORA_INDY 0x11   //Inclusive OR (Indirect Y). Takes 5(+1) cycles.
+
+#define BIT_ZP 0x24     //Bit test (Zero page). Takes 3 cycles.
+#define BIT_ABS 0x2C    //Bit test (Absolute). Takes 4 cycles.
 
 #pragma endregion
 
