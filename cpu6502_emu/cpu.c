@@ -6,7 +6,7 @@
 
 #pragma region Memory helpers
 
-static byte readByteFromAddr(word addr, const RAM* ram, u32* cycles) {
+static inline byte readByteFromAddr(word addr, const struct RAM* ram, u32* cycles) {
    byte val = ram->data[addr];
    (*cycles)++;
 
@@ -17,7 +17,7 @@ static byte readByteFromAddr(word addr, const RAM* ram, u32* cycles) {
    return val;
 }
 
-static word readWordFromAddr(word addr, const RAM* ram, u32* cycles) {
+static word readWordFromAddr(word addr, const struct RAM* ram, u32* cycles) {
    byte loB = readByteFromAddr(addr, ram, cycles);
    byte hiB = readByteFromAddr(addr + 1, ram, cycles);
 
@@ -28,19 +28,19 @@ static word readWordFromAddr(word addr, const RAM* ram, u32* cycles) {
    return (word)(loB | (hiB << 8));
 }
 
-static byte readByteFromPC(word* pc, const RAM* ram, u32* cycles) {
+static byte readByteFromPC(word* pc, const struct RAM* ram, u32* cycles) {
    byte val = readByteFromAddr(*pc, ram, cycles);
    (*pc)++;
    return val;
 }
 
-static word readWordFromPC(word* pc, const RAM* ram, u32* cycles) {
+static word readWordFromPC(word* pc, const struct RAM* ram, u32* cycles) {
    word val = readWordFromAddr(*pc, ram, cycles);
    (*pc)+=2;
    return val;
 }
 
-static void writeByteToMemory(byte val, word addr, RAM* ram, u32* cycles) {
+static inline void writeByteToMemory(byte val, word addr, struct RAM* ram, u32* cycles) {
    ram->data[addr] = val;
    (*cycles)++;
 #ifdef _DEBUG
@@ -48,7 +48,7 @@ static void writeByteToMemory(byte val, word addr, RAM* ram, u32* cycles) {
 #endif // _DEBUG
 }
 
-static void pushByteToStack(RAM* ram, word* sp, byte val, u32* cycles) {
+static inline void pushByteToStack(struct RAM* ram, word* sp, byte val, u32* cycles) {
    (*sp)--;
    ram->data[*sp] = val;
    (*cycles)++;
@@ -57,7 +57,7 @@ static void pushByteToStack(RAM* ram, word* sp, byte val, u32* cycles) {
 #endif // _DEBUG
 }
 
-static byte popByteFromStack(const RAM* ram, word* sp, u32* cycles) {
+static inline byte popByteFromStack(const struct RAM* ram, word* sp, u32* cycles) {
    byte val = ram->data[*sp];
    (*sp)++;
    (*cycles)++;
@@ -67,12 +67,12 @@ static byte popByteFromStack(const RAM* ram, word* sp, u32* cycles) {
    return val;
 }
 
-static void pushWordToStack(RAM* ram, word* sp, word val, u32* cycles) {
+static void pushWordToStack(struct RAM* ram, word* sp, word val, u32* cycles) {
    pushByteToStack(ram, sp, (val >> 8), cycles);
    pushByteToStack(ram, sp, (val & 0xFF), cycles);
 }
 
-static word popWordFromStack(const RAM* ram, word* sp, u32* cycles) {
+static word popWordFromStack(const struct RAM* ram, word* sp, u32* cycles) {
    byte lB = popByteFromStack(ram, sp, cycles);
    byte hB = popByteFromStack(ram, sp, cycles);
    (*cycles)++;
@@ -89,7 +89,7 @@ typedef enum {
    Y
 } AddrModeReg;
 
-static byte zpAddr(CPU* cpu, const RAM* ram, AddrModeReg reg) {
+static byte zpAddr(struct CPU* cpu, const struct RAM* ram, AddrModeReg reg) {
    byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
    byte regVal;
 
@@ -106,7 +106,7 @@ static byte zpAddr(CPU* cpu, const RAM* ram, AddrModeReg reg) {
    return zpAddr;
 }
 
-static word absAddr(CPU* cpu, const RAM* ram, AddrModeReg reg, bool canPageCross) {
+static word absAddr(struct CPU* cpu, const struct RAM* ram, AddrModeReg reg, bool canPageCross) {
    word absAddr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
    byte regVal;
 
@@ -128,7 +128,7 @@ static word absAddr(CPU* cpu, const RAM* ram, AddrModeReg reg, bool canPageCross
    return absAddrReg;
 }
 
-static word indAddr(CPU* cpu, const RAM* ram, AddrModeReg reg, bool canPageCross) {
+static word indAddr(struct CPU* cpu, const struct RAM* ram, AddrModeReg reg, bool canPageCross) {
    byte zpAddr = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
    word baseAddr;
 
@@ -161,7 +161,7 @@ static word indAddr(CPU* cpu, const RAM* ram, AddrModeReg reg, bool canPageCross
 
 #pragma region Flag helpers
 
-static void updatePS(CPU* cpu) {
+static void updatePS(struct CPU* cpu) {
    byte ps = 0x0;
 
    ps |= (cpu->n << 7);
@@ -179,7 +179,7 @@ static void updatePS(CPU* cpu) {
 #endif // _DEBUG
 }
 
-static void setZNFlags(CPU* cpu, byte reg) {
+static inline void setZNFlags(struct CPU* cpu, byte reg) {
    cpu->z = (reg == 0);
    cpu->n = (reg & 0x80) > 0;
 #ifdef _DEBUG
@@ -188,7 +188,7 @@ static void setZNFlags(CPU* cpu, byte reg) {
    updatePS(cpu);
 }
 
-static void setCVFlags(CPU* cpu, word sum) {
+static inline void setCVFlags(struct CPU* cpu, word sum) {
    cpu->c = sum > 0xFF;
    cpu->v = (sum & 0x100) != 0;
 #ifdef _DEBUG
@@ -207,7 +207,7 @@ typedef enum {
    ORA
 } LogIns;
 
-static void ldIns(CPU* cpu, const RAM* ram, byte* reg, word valAddr) {
+static void ldIns(struct CPU* cpu, const struct RAM* ram, byte* reg, word valAddr) {
    byte val = EMPTY_ADDR == valAddr 
       ? readByteFromPC(&cpu->pc, ram, &cpu->cycles) 
       : readByteFromAddr(valAddr, ram, &cpu->cycles);
@@ -215,7 +215,7 @@ static void ldIns(CPU* cpu, const RAM* ram, byte* reg, word valAddr) {
    setZNFlags(cpu, *reg);
 }
 
-static void logIns(CPU* cpu, const RAM* ram, word valAddr, LogIns ins) {
+static void logIns(struct CPU* cpu, const struct RAM* ram, word valAddr, LogIns ins) {
    byte val = EMPTY_ADDR == valAddr
       ? readByteFromPC(&cpu->pc, ram, &cpu->cycles)
       : readByteFromAddr(valAddr, ram, &cpu->cycles);
@@ -240,7 +240,7 @@ static void logIns(CPU* cpu, const RAM* ram, word valAddr, LogIns ins) {
 
 #pragma region Instruction handlers
 
-static void jsr(CPU* cpu, RAM* ram) {
+static void jsr(struct CPU* cpu, struct RAM* ram) {
    word addr = readWordFromPC(&cpu->pc, ram, &cpu->cycles);
    pushWordToStack(ram, &cpu->sp, cpu->pc - 1, &cpu->cycles);
 
@@ -248,174 +248,165 @@ static void jsr(CPU* cpu, RAM* ram) {
    cpu->cycles++;
 }
 
-static void rts(CPU* cpu, const RAM* ram) {
+static void rts(struct CPU* cpu, const struct RAM* ram) {
    word addr = popWordFromStack(ram, &cpu->sp, &cpu->cycles);
    cpu->pc = addr + 1;
    cpu->cycles += 2;
 }
 
-static void adcImmediate(CPU* cpu, const RAM* ram) {
-   byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
-   word sum = cpu->a + val + cpu->c;
-   cpu->a = (byte)sum;
-
-   setZNFlags(cpu, cpu->a);
-   setCVFlags(cpu, sum);
-}
-
-static void ldaImmediate(CPU* cpu, const RAM* ram) {
+static void ldaImmediate(struct CPU* cpu, const struct RAM* ram) {
    ldIns(cpu, ram, &cpu->a, EMPTY_ADDR);
 }
 
-static void ldaZeroPage(CPU* cpu, const RAM* ram) {
+static void ldaZeroPage(struct CPU* cpu, const struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
    ldIns(cpu, ram, &cpu->a, addr);
 }
 
-static void ldaZeroPageX(CPU* cpu, const RAM* ram) {
+static void ldaZeroPageX(struct CPU* cpu, const struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, X);
    ldIns(cpu, ram, &cpu->a, addr);
 }
 
-static void ldaAbsolute(CPU* cpu, const RAM* ram) {
+static void ldaAbsolute(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
    ldIns(cpu, ram, &cpu->a, addr);
 }
 
-static void ldaAbsoluteX(CPU* cpu, const RAM* ram) {
+static void ldaAbsoluteX(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, X, true);
    ldIns(cpu, ram, &cpu->a, addr);
 }
 
-static void ldaAbsoluteY(CPU* cpu, const RAM* ram) {
+static void ldaAbsoluteY(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, Y, true);
    ldIns(cpu, ram, &cpu->a, addr);
 }
 
-static void ldaIndirectX(CPU* cpu, const RAM* ram) {
+static void ldaIndirectX(struct CPU* cpu, const struct RAM* ram) {
    word addr = indAddr(cpu, ram, X, false);   
    ldIns(cpu, ram, &cpu->a, addr);
 }
 
-static void ldaIndirectY(CPU* cpu, const RAM* ram) {
+static void ldaIndirectY(struct CPU* cpu, const struct RAM* ram) {
    word addr = indAddr(cpu, ram, Y, true);
    ldIns(cpu, ram, &cpu->a, addr);
 }
 
-static void ldxImmediate(CPU* cpu, const RAM* ram) {
+static void ldxImmediate(struct CPU* cpu, const struct RAM* ram) {
    ldIns(cpu, ram, &cpu->x, EMPTY_ADDR);
 }
 
-static void ldxZeroPage(CPU* cpu, const RAM* ram) {
+static void ldxZeroPage(struct CPU* cpu, const struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
    ldIns(cpu, ram, &cpu->x, addr);
 }
 
-static void ldxZeroPageY(CPU* cpu, const RAM* ram) {
+static void ldxZeroPageY(struct CPU* cpu, const struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, Y);
    ldIns(cpu, ram, &cpu->x, addr);
 }
 
-static void ldxAbsolute(CPU* cpu, const RAM* ram) {
+static void ldxAbsolute(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
    ldIns(cpu, ram, &cpu->x, addr);
 }
 
-static void ldxAbsoluteY(CPU* cpu, const RAM* ram) {
+static void ldxAbsoluteY(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, Y, true);
    ldIns(cpu, ram, &cpu->x, addr);
 }
 
-static void ldyImmediate(CPU* cpu, const RAM* ram) {
+static void ldyImmediate(struct CPU* cpu, const struct RAM* ram) {
    ldIns(cpu, ram, &cpu->y, EMPTY_ADDR);
 }
 
-static void ldyZeroPage(CPU* cpu, const RAM* ram) {
+static void ldyZeroPage(struct CPU* cpu, const struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
    ldIns(cpu, ram, &cpu->y, addr);
 }
 
-static void ldyZeroPageX(CPU* cpu, const RAM* ram) {
+static void ldyZeroPageX(struct CPU* cpu, const struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, X);
    ldIns(cpu, ram, &cpu->y, addr);
 }
 
-static void ldyAbsolute(CPU* cpu, const RAM* ram) {
+static void ldyAbsolute(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
    ldIns(cpu, ram, &cpu->y, addr);
 }
 
-static void ldyAbsoluteX(CPU* cpu, const RAM* ram) {
+static void ldyAbsoluteX(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, X, true);
    ldIns(cpu, ram, &cpu->y, addr);
 }
 
-static void staZeroPage(CPU* cpu, RAM* ram) {
+static void staZeroPage(struct CPU* cpu, struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
    writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
 }
 
-static void staZeroPageX(CPU* cpu, RAM* ram) {
+static void staZeroPageX(struct CPU* cpu, struct RAM* ram) {
    word addr = zpAddr(cpu, ram, X);
    writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
 }
 
-static void staAbsolute(CPU* cpu, RAM* ram) {
+static void staAbsolute(struct CPU* cpu, struct RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
    writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
 }
 
-static void staAbsoluteX(CPU* cpu, RAM* ram) {
+static void staAbsoluteX(struct CPU* cpu, struct RAM* ram) {
    word addr = absAddr(cpu, ram, X, false);
    writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
 }
 
-static void staAbsoluteY(CPU* cpu, RAM* ram) {
+static void staAbsoluteY(struct CPU* cpu, struct RAM* ram) {
    word addr = absAddr(cpu, ram, Y, false);
    writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
 }
 
-static void staIndirectX(CPU* cpu, RAM* ram) {
+static void staIndirectX(struct CPU* cpu, struct RAM* ram) {
    word addr = indAddr(cpu, ram, X, false);
    writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
 }
 
-static void staIndirectY(CPU* cpu, RAM* ram) {
+static void staIndirectY(struct CPU* cpu, struct RAM* ram) {
    word addr = indAddr(cpu, ram, Y, false);
    writeByteToMemory(cpu->a, addr, ram, &cpu->cycles);
 }
 
-static void stxZeroPage(CPU* cpu, RAM* ram) {
+static void stxZeroPage(struct CPU* cpu, struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
    writeByteToMemory(cpu->x, addr, ram, &cpu->cycles);
 }
 
-static void stxZeroPageY(CPU* cpu, RAM* ram) {
+static void stxZeroPageY(struct CPU* cpu, struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, Y);
    writeByteToMemory(cpu->x, addr, ram, &cpu->cycles);
 }
 
-static void stxAbsolute(CPU* cpu, RAM* ram) {
+static void stxAbsolute(struct CPU* cpu, struct RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
    writeByteToMemory(cpu->x, addr, ram, &cpu->cycles);
 }
 
-static void styZeroPage(CPU* cpu, RAM* ram) {
+static void styZeroPage(struct CPU* cpu, struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
    writeByteToMemory(cpu->y, addr, ram, &cpu->cycles);
 }
 
-static void styZeroPageX(CPU* cpu, RAM* ram) {
+static void styZeroPageX(struct CPU* cpu, struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, X);
    writeByteToMemory(cpu->y, addr, ram, &cpu->cycles);
 }
 
-static void styAbsolute(CPU* cpu, RAM* ram) {
+static void styAbsolute(struct CPU* cpu, struct RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
    writeByteToMemory(cpu->y, addr, ram, &cpu->cycles);
 }
 
-static void tax(CPU* cpu, const RAM* ram) {
+static void tax(struct CPU* cpu, const struct RAM* ram) {
    (void)ram; //unused
 
    cpu->x = cpu->a;
@@ -423,7 +414,7 @@ static void tax(CPU* cpu, const RAM* ram) {
    setZNFlags(cpu, cpu->x);
 }
 
-static void txa(CPU* cpu, const RAM* ram) {
+static void txa(struct CPU* cpu, const struct RAM* ram) {
    (void)ram; //unused
 
    cpu->a = cpu->x;
@@ -431,7 +422,7 @@ static void txa(CPU* cpu, const RAM* ram) {
    setZNFlags(cpu, cpu->a);
 }
 
-static void tay(CPU* cpu, const RAM* ram) {
+static void tay(struct CPU* cpu, const struct RAM* ram) {
    (void)ram; //unused
 
    cpu->y = cpu->a;
@@ -439,7 +430,7 @@ static void tay(CPU* cpu, const RAM* ram) {
    setZNFlags(cpu, cpu->y);
 }
 
-static void tya(CPU* cpu, const RAM* ram) {
+static void tya(struct CPU* cpu, const struct RAM* ram) {
    (void)ram; //unused
 
    cpu->a = cpu->y;
@@ -447,7 +438,7 @@ static void tya(CPU* cpu, const RAM* ram) {
    setZNFlags(cpu, cpu->a);
 }
 
-static void tsx(CPU* cpu, const RAM* ram) {
+static void tsx(struct CPU* cpu, const struct RAM* ram) {
    (void)ram;
 
    cpu->x = (cpu->sp & 0x00FF);
@@ -455,31 +446,31 @@ static void tsx(CPU* cpu, const RAM* ram) {
    setZNFlags(cpu, cpu->x);
 }
 
-static void txs(CPU* cpu, const RAM* ram) {
+static void txs(struct CPU* cpu, const struct RAM* ram) {
    (void)ram;
 
    cpu->sp = 0x0100 | cpu->x;
    cpu->cycles++;
 }
 
-static void pha(CPU* cpu, RAM* ram) {
+static void pha(struct CPU* cpu, struct RAM* ram) {
    pushByteToStack(ram, &cpu->sp, cpu->a, &cpu->cycles);
    cpu->cycles++;
 }
 
-static void php(CPU* cpu, RAM* ram) {
+static void php(struct CPU* cpu, struct RAM* ram) {
    pushByteToStack(ram, &cpu->sp, cpu->ps, &cpu->cycles);
    cpu->cycles++;
 }
 
-static void pla(CPU* cpu, const RAM* ram) {
+static void pla(struct CPU* cpu, const struct RAM* ram) {
    byte val = popByteFromStack(ram, &cpu->sp, &cpu->cycles);
    cpu->a = val;
    cpu->cycles += 2;
    setZNFlags(cpu, cpu->a);
 }
 
-static void plp(CPU* cpu, const RAM* ram) {
+static void plp(struct CPU* cpu, const struct RAM* ram) {
    byte val = popByteFromStack(ram, &cpu->sp, &cpu->cycles);
    cpu->ps = val;
    cpu->cycles++;
@@ -494,124 +485,124 @@ static void plp(CPU* cpu, const RAM* ram) {
    cpu->cycles++;
 }
 
-static void andImmediate(CPU* cpu, const RAM* ram) {
+static void andImmediate(struct CPU* cpu, const struct RAM* ram) {
    logIns(cpu, ram, EMPTY_ADDR, AND);
 }
 
-static void andZeroPage(CPU* cpu, const RAM* ram) {
+static void andZeroPage(struct CPU* cpu, const struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
    logIns(cpu, ram, addr, AND);
 }
 
-static void andZeroPageX(CPU* cpu, const RAM* ram) {
+static void andZeroPageX(struct CPU* cpu, const struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, X);
    logIns(cpu, ram, addr, AND);
 }
 
-static void andAbsolute(CPU* cpu, const RAM* ram) {
+static void andAbsolute(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
    logIns(cpu, ram, addr, AND);
 }
 
-static void andAbsoluteX(CPU* cpu, const RAM* ram) {
+static void andAbsoluteX(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, X, true);
    logIns(cpu, ram, addr, AND);
 }
 
-static void andAbsoluteY(CPU* cpu, const RAM* ram) {
+static void andAbsoluteY(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, Y, true);
    logIns(cpu, ram, addr, AND);
 }
 
-static void andIndirectX(CPU* cpu, const RAM* ram) {
+static void andIndirectX(struct CPU* cpu, const struct RAM* ram) {
    word addr = indAddr(cpu, ram, X, false);
    logIns(cpu, ram, addr, AND);
 }
 
-static void andIndirectY(CPU* cpu, const RAM* ram) {
+static void andIndirectY(struct CPU* cpu, const struct RAM* ram) {
    word addr = indAddr(cpu, ram, Y, true);
    logIns(cpu, ram, addr, AND);
 }
 
-static void eorImmediate(CPU* cpu, const RAM* ram) {
+static void eorImmediate(struct CPU* cpu, const struct RAM* ram) {
    logIns(cpu, ram, EMPTY_ADDR, EOR);
 }
 
-static void eorZeroPage(CPU* cpu, const RAM* ram) {
+static void eorZeroPage(struct CPU* cpu, const struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, NONE);
    logIns(cpu, ram, addr, EOR);
 }
 
-static void eorZeroPageX(CPU* cpu, const RAM* ram) {
+static void eorZeroPageX(struct CPU* cpu, const struct RAM* ram) {
    byte addr = zpAddr(cpu, ram, X);
    logIns(cpu, ram, addr, EOR);
 }
 
-static void eorAbsolute(CPU* cpu, const RAM* ram) {
+static void eorAbsolute(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
    logIns(cpu, ram, addr, EOR);
 }
 
-static void eorAbsoluteX(CPU* cpu, const RAM* ram) {
+static void eorAbsoluteX(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, X, true);
    logIns(cpu, ram, addr, EOR);
 }
 
-static void eorAbsoluteY(CPU* cpu, const RAM* ram) {
+static void eorAbsoluteY(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, Y, true);
    logIns(cpu, ram, addr, EOR);
 }
 
-static void eorIndirectX(CPU* cpu, const RAM* ram) {
+static void eorIndirectX(struct CPU* cpu, const struct RAM* ram) {
    word addr = indAddr(cpu, ram, X, false);
    logIns(cpu, ram, addr, EOR);
 }
 
-static void eorIndirectY(CPU* cpu, const RAM* ram) {
+static void eorIndirectY(struct CPU* cpu, const struct RAM* ram) {
    word addr = indAddr(cpu, ram, Y, true);
    logIns(cpu, ram, addr, EOR);
 }
 
-static void oraImmediate(CPU* cpu, const RAM* ram) {
+static void oraImmediate(struct CPU* cpu, const struct RAM* ram) {
    logIns(cpu, ram, EMPTY_ADDR, ORA);
 }
 
-static void oraZeroPage(CPU* cpu, const RAM* ram) {
+static void oraZeroPage(struct CPU* cpu, const struct RAM* ram) {
    word addr = zpAddr(cpu, ram, NONE);
    logIns(cpu, ram, addr, ORA);
 }
 
-static void oraZeroPageX(CPU* cpu, const RAM* ram) {
+static void oraZeroPageX(struct CPU* cpu, const struct RAM* ram) {
    word addr = zpAddr(cpu, ram, X);
    logIns(cpu, ram, addr, ORA);
 }
 
-static void oraAbsolute(CPU* cpu, const RAM* ram) {
+static void oraAbsolute(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
    logIns(cpu, ram, addr, ORA);
 }
 
-static void oraAbsoluteX(CPU* cpu, const RAM* ram) {
+static void oraAbsoluteX(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, X, true);
    logIns(cpu, ram, addr, ORA);
 }
 
-static void oraAbsoluteY(CPU* cpu, const RAM* ram) {
+static void oraAbsoluteY(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, Y, true);
    logIns(cpu, ram, addr, ORA);
 }
 
-static void oraIndirectX(CPU* cpu, const RAM* ram) {
+static void oraIndirectX(struct CPU* cpu, const struct RAM* ram) {
    word addr = indAddr(cpu, ram, X, false);
    logIns(cpu, ram, addr, ORA);
 }
 
-static void oraIndirectY(CPU* cpu, const RAM* ram) {
+static void oraIndirectY(struct CPU* cpu, const struct RAM* ram) {
    word addr = indAddr(cpu, ram, Y, true);
    logIns(cpu, ram, addr, ORA);
 }
 
-static void bitZeroPage(CPU* cpu, const RAM* ram) {
+static void bitZeroPage(struct CPU* cpu, const struct RAM* ram) {
    word addr = zpAddr(cpu, ram, NONE);
    byte val = readByteFromAddr(addr, ram, &cpu->cycles);
 
@@ -621,7 +612,7 @@ static void bitZeroPage(CPU* cpu, const RAM* ram) {
    updatePS(cpu);
 }
 
-static void bitAbsolute(CPU* cpu, const RAM* ram) {
+static void bitAbsolute(struct CPU* cpu, const struct RAM* ram) {
    word addr = absAddr(cpu, ram, NONE, false);
    byte val = readByteFromAddr(addr, ram, &cpu->cycles);
 
@@ -629,15 +620,23 @@ static void bitAbsolute(CPU* cpu, const RAM* ram) {
    setZNFlags(cpu, res);
    cpu->v = (res & 0x6) != 0;
    updatePS(cpu);
+}
+
+static void adcImmediate(struct CPU* cpu, const struct RAM* ram) {
+   byte val = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
+   word sum = cpu->a + val + cpu->c;
+   cpu->a = (byte)sum;
+
+   setZNFlags(cpu, cpu->a);
+   setCVFlags(cpu, sum);
 }
 
 #pragma endregion
 
 //Instruction map.
-void(*insTable[256])(CPU* cpu, RAM* ram) = {
+void(*insTable[256])(struct CPU* cpu, struct RAM* ram) = {
    [JSR] = &jsr,
    [RTS] = &rts,
-   [ADC_IM] = &adcImmediate,
    [LDA_IM] = &ldaImmediate,
    [LDA_ZP] = &ldaZeroPage,
    [LDA_ZPX] = &ldaZeroPageX,
@@ -705,10 +704,11 @@ void(*insTable[256])(CPU* cpu, RAM* ram) = {
    [ORA_INDY] = &oraIndirectY,
    [BIT_ZP] = &bitZeroPage,
    [BIT_ABS] = &bitAbsolute,
+   [ADC_IM] = &adcImmediate,
 };
 
-RAM* initRAM() {
-   RAM* ram = malloc(sizeof(RAM));
+struct RAM* initRAM() {
+   struct RAM* ram = malloc(sizeof(struct RAM));
    if (NULL == ram) {
       printf("Allocation error.");
       return NULL;
@@ -729,7 +729,7 @@ RAM* initRAM() {
 }
 
 //Does not set RAM ptr to NULL.
-void freeRAM(RAM* ram) {
+void freeRAM(struct RAM* ram) {
    free(ram->data);
    free(ram);
 
@@ -738,7 +738,7 @@ void freeRAM(RAM* ram) {
 #endif //_DEBUG
 }
 
-void resetCPU(CPU* cpu, word sPC) {
+void resetCPU(struct CPU* cpu, word sPC) {
    cpu->pc = sPC;
    cpu->sp = 0x01FF;
 
@@ -761,7 +761,7 @@ void resetCPU(CPU* cpu, word sPC) {
 #endif // _DEBUG
 }
 
-int exec(CPU* cpu, RAM* ram, u32 insCount) {
+int exec(struct CPU* cpu, struct RAM* ram, u32 insCount) {
    for (u32 i = insCount; i > 0; i--) {
       byte opCode = readByteFromPC(&cpu->pc, ram, &cpu->cycles);
       

@@ -140,12 +140,9 @@ struct CPU {
    u32 cycles;
 };
 
-typedef struct RAM RAM;
-typedef struct CPU CPU;
-
-void resetCPU(CPU* cpu, word sPC);
-RAM* initRAM();
-void freeRAM(RAM* ram);
-int exec(CPU* cpu, RAM* ram, u32 insCount);
+void resetCPU(struct CPU* cpu, word sPC);
+struct RAM* initRAM();
+void freeRAM(struct RAM* ram);
+int exec(struct CPU* cpu, struct RAM* ram, u32 insCount);
 
 #endif // !CPU_H

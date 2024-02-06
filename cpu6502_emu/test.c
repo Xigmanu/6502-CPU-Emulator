@@ -3,8 +3,8 @@
 
 static void testResetCPU(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ASSERT_EQUAL(0xFFFC, cpu.pc, "PC");
@@ -25,8 +25,8 @@ static void testResetCPU(void) {
 
 static void testJSR(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = JSR;
@@ -44,8 +44,8 @@ static void testJSR(void) {
 }
 static void testRTS(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = JSR;
@@ -65,8 +65,8 @@ static void testRTS(void) {
 
 static void testLDAImmediate(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDA_IM;
@@ -85,8 +85,8 @@ static void testLDAImmediate(void) {
 
 static void testLDAZeroPage(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDA_ZP;
@@ -105,8 +105,8 @@ static void testLDAZeroPage(void) {
 
 static void testLDAZeroPageX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
@@ -126,8 +126,8 @@ static void testLDAZeroPageX(void) {
 
 static void testLDAAbsolute(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDA_ABS;
@@ -146,8 +146,8 @@ static void testLDAAbsolute(void) {
 }
 static void testLDAAbsoluteX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
@@ -167,8 +167,8 @@ static void testLDAAbsoluteX(void) {
 }
 static void testLDAAbsoluteY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.y = 0x10;
@@ -188,8 +188,8 @@ static void testLDAAbsoluteY(void) {
 }
 static void testLDAIndirectX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
@@ -211,8 +211,8 @@ static void testLDAIndirectX(void) {
 
 static void testLDAIndirectY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.y = 0x10;
@@ -234,8 +234,8 @@ static void testLDAIndirectY(void) {
 
 static void testLDXImmediate(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDX_IM;
@@ -252,8 +252,8 @@ static void testLDXImmediate(void) {
 }
 static void testLDXZeroPage(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDX_ZP;
@@ -271,8 +271,8 @@ static void testLDXZeroPage(void) {
 } 
 static void testLDXZeroPageY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    
    cpu.y = 0x10;
@@ -291,8 +291,8 @@ static void testLDXZeroPageY(void) {
 }
 static void testLDXAbsolute(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDX_ABS;
@@ -312,8 +312,8 @@ static void testLDXAbsolute(void) {
 
 static void testLDXAbsoluteY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.y = 0x10;
@@ -334,8 +334,8 @@ static void testLDXAbsoluteY(void) {
 
 static void testLDYImmediate(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    
    ram->data[0xFFFC] = LDY_IM;
@@ -353,8 +353,8 @@ static void testLDYImmediate(void) {
 
 static void testLDYZeroPage(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDY_ZP;
@@ -373,8 +373,8 @@ static void testLDYZeroPage(void) {
 
 static void testLDYZeroPageX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
@@ -394,8 +394,8 @@ static void testLDYZeroPageX(void) {
 
 static void testLDYAbsolute(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDY_ABS;
@@ -415,8 +415,8 @@ static void testLDYAbsolute(void) {
 
 static void testLDYAbsoluteX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
@@ -437,8 +437,8 @@ static void testLDYAbsoluteX(void) {
 
 static void testSTAZeroPage(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -455,8 +455,8 @@ static void testSTAZeroPage(void) {
 
 static void testSTAZeroPageX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -474,8 +474,8 @@ static void testSTAZeroPageX(void) {
 
 static void testSTAAbsolute(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -493,8 +493,8 @@ static void testSTAAbsolute(void) {
 
 static void testSTAAbsoluteX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -513,8 +513,8 @@ static void testSTAAbsoluteX(void) {
 
 static void testSTAAbsoluteY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -533,8 +533,8 @@ static void testSTAAbsoluteY(void) {
 
 static void testSTAIndirectX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -554,8 +554,8 @@ static void testSTAIndirectX(void) {
 
 static void testSTAIndirectY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -575,8 +575,8 @@ static void testSTAIndirectY(void) {
 
 static void testSTXZeroPage(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x42;
@@ -593,8 +593,8 @@ static void testSTXZeroPage(void) {
 
 static void testSTXZeroPageY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x42;
@@ -612,8 +612,8 @@ static void testSTXZeroPageY(void) {
 
 static void testSTXAbsolute(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x42;
@@ -631,8 +631,8 @@ static void testSTXAbsolute(void) {
 
 static void testSTYZeroPage(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.y = 0x42;
@@ -649,8 +649,8 @@ static void testSTYZeroPage(void) {
 
 static void testSTYZeroPageX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.x = 0x42;
@@ -668,8 +668,8 @@ static void testSTYZeroPageX(void) {
 
 static void testSTYAbsolute(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.y = 0x42;
@@ -687,9 +687,9 @@ static void testSTYAbsolute(void) {
 
 static void testTAX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
+   struct CPU cpu;
    resetCPU(&cpu, 0xFFFC);
-   RAM* ram = initRAM();
+   struct RAM* ram = initRAM();
 
    cpu.a = 0x42;
    ram->data[0xFFFC] = TAX;
@@ -704,9 +704,9 @@ static void testTAX(void) {
 
 static void testTXA(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
+   struct CPU cpu;
    resetCPU(&cpu, 0xFFFC);
-   RAM* ram = initRAM();
+   struct RAM* ram = initRAM();
 
    cpu.x = 0x42;
    ram->data[0xFFFC] = TXA;
@@ -721,9 +721,9 @@ static void testTXA(void) {
 
 static void testTAY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
+   struct CPU cpu;
    resetCPU(&cpu, 0xFFFC);
-   RAM* ram = initRAM();
+   struct RAM* ram = initRAM();
 
    cpu.a = 0x42;
    ram->data[0xFFFC] = TAY;
@@ -738,9 +738,9 @@ static void testTAY(void) {
 
 static void testTYA(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
+   struct CPU cpu;
    resetCPU(&cpu, 0xFFFC);
-   RAM* ram = initRAM();
+   struct RAM* ram = initRAM();
 
    cpu.y = 0xBE;
    ram->data[0xFFFC] = TYA;
@@ -762,9 +762,9 @@ static void testTYA(void) {
 
 static void testTSX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
+   struct CPU cpu;
    resetCPU(&cpu, 0xFFFC);
-   RAM* ram = initRAM();
+   struct RAM* ram = initRAM();
 
    cpu.sp = 0x42;
    ram->data[0xFFFC] = TSX;
@@ -786,9 +786,9 @@ static void testTSX(void) {
 
 static void testTXS(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
+   struct CPU cpu;
    resetCPU(&cpu, 0xFFFC);
-   RAM* ram = initRAM();
+   struct RAM* ram = initRAM();
    
    cpu.x = 0x42;
    ram->data[0xFFFC] = TXS;
@@ -810,9 +810,9 @@ static void testTXS(void) {
 
 static void testPHA(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
+   struct CPU cpu;
    resetCPU(&cpu, 0xFFFC);
-   RAM* ram = initRAM();
+   struct RAM* ram = initRAM();
 
    cpu.a = 0x42;
    ram->data[0xFFFC] = PHA;
@@ -835,9 +835,9 @@ static void testPHA(void) {
 
 static void testPHP(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
+   struct CPU cpu;
    resetCPU(&cpu, 0xFFFC);
-   RAM* ram = initRAM();
+   struct RAM* ram = initRAM();
 
    ram->data[0xFFFC] = LDA_IM;
    ram->data[0xFFFD] = 0xBE;
@@ -861,9 +861,9 @@ static void testPHP(void) {
 
 static void testPLA(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
+   struct CPU cpu;
    resetCPU(&cpu, 0xFFFC);
-   RAM* ram = initRAM();
+   struct RAM* ram = initRAM();
    
    cpu.sp = 0x01FE;
    ram->data[0x01FE] = 0x42;
@@ -887,9 +887,9 @@ static void testPLA(void) {
 
 static void testPLP(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
+   struct CPU cpu;
    resetCPU(&cpu, 0xFFFC);
-   RAM* ram = initRAM();
+   struct RAM* ram = initRAM();
 
    cpu.sp = 0x01FE;
    ram->data[0x01FE] = 0x81;
@@ -913,8 +913,8 @@ static void testPLP(void) {
 
 static void testANDImmediate(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
@@ -939,8 +939,8 @@ static void testANDImmediate(void) {
 
 static void testANDZeroPage(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
@@ -966,8 +966,8 @@ static void testANDZeroPage(void) {
 
 static void testANDZeroPageX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.x = 0x10;
@@ -994,8 +994,8 @@ static void testANDZeroPageX(void) {
 
 static void testANDAbsolute(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
@@ -1022,8 +1022,8 @@ static void testANDAbsolute(void) {
 
 static void testANDAbsoluteX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.x = 0x10;
@@ -1051,8 +1051,8 @@ static void testANDAbsoluteX(void) {
 
 static void testANDAbsoluteY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.y = 0x10;
@@ -1080,8 +1080,8 @@ static void testANDAbsoluteY(void) {
 
 static void testANDIndirectX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -1110,8 +1110,8 @@ static void testANDIndirectX(void) {
 
 static void testANDIndirectY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -1140,8 +1140,8 @@ static void testANDIndirectY(void) {
 
 static void testEORImmediate(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
@@ -1166,8 +1166,8 @@ static void testEORImmediate(void) {
 
 static void testEORZeroPage(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
@@ -1193,8 +1193,8 @@ static void testEORZeroPage(void) {
 
 static void testEORZeroPageX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.x = 0x10;
@@ -1221,8 +1221,8 @@ static void testEORZeroPageX(void) {
 
 static void testEORAbsolute(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
@@ -1249,8 +1249,8 @@ static void testEORAbsolute(void) {
 
 static void testEORAbsoluteX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.y = 0x10;
@@ -1278,8 +1278,8 @@ static void testEORAbsoluteX(void) {
 
 static void testEORAbsoluteY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.y = 0x10;
@@ -1307,8 +1307,8 @@ static void testEORAbsoluteY(void) {
 
 static void testEORIndirectX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -1337,8 +1337,8 @@ static void testEORIndirectX(void) {
 
 static void testEORIndirectY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -1367,8 +1367,8 @@ static void testEORIndirectY(void) {
 
 static void testORAImmediate(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
@@ -1393,8 +1393,8 @@ static void testORAImmediate(void) {
 
 static void testORAZeroPage(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
@@ -1420,8 +1420,8 @@ static void testORAZeroPage(void) {
 
 static void testORAZeroPageX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.x = 0x10;
@@ -1448,8 +1448,8 @@ static void testORAZeroPageX(void) {
 
 static void testORAAbsolute(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
@@ -1476,8 +1476,8 @@ static void testORAAbsolute(void) {
 
 static void testORAAbsoluteX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.y = 0x10;
@@ -1505,8 +1505,8 @@ static void testORAAbsoluteX(void) {
 
 static void testORAAbsoluteY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.y = 0x10;
@@ -1534,8 +1534,8 @@ static void testORAAbsoluteY(void) {
 
 static void testORAIndirectX(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -1564,8 +1564,8 @@ static void testORAIndirectX(void) {
 
 static void testORAIndirectY(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
@@ -1594,8 +1594,8 @@ static void testORAIndirectY(void) {
 
 static void testBITZeroPage(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0xFF;
@@ -1621,8 +1621,8 @@ static void testBITZeroPage(void) {
 
 static void testBITAbsolute(void) {
    PRINT_TEST_NAME();
-   CPU cpu;
-   RAM* ram = initRAM();
+   struct CPU cpu;
+   struct RAM* ram = initRAM();
    resetCPU(&cpu, 0xFFFC);
 
    cpu.a = 0xA5;
