@@ -29,7 +29,7 @@ int main() {
    return 0;
 }
 #else
-#include "test.h"
+#include "../include/test.h"
 int main() {
    printf("RUNNING %d TESTS\n", TEST_COUNT);
 
