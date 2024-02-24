@@ -1,10 +1,7 @@
 #pragma once
-#ifndef CPU_H
-#define CPU_H
+#ifndef INS_H
+#define INS_H
 
-#include <stdlib.h>
-
-#define MEM_MAX 65536   //(64 * 1024)
 #define JSR 0x20        //Jump to Subroutine. Takes 6 cycles.
 #define RTS 0x60        //Returns to the calling routine. Takes 6 cycles.
 
@@ -112,37 +109,4 @@
 
 #pragma endregion
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int u32;
-
-struct RAM {
-   byte* data;
-};
-
-struct CPU {
-   word pc;
-   word sp;
-
-   byte a;
-   byte x;
-   byte y;
-   byte ps;
-
-   byte c : 1;
-   byte z : 1;
-   byte i : 1;
-   byte d : 1;
-   byte b : 1;
-   byte v : 1;
-   byte n : 1;
-
-   u32 cycles;
-};
-
-void resetCPU(struct CPU* cpu, word sPC);
-struct RAM* initRAM();
-void freeRAM(struct RAM* ram);
-int exec(struct CPU* cpu, struct RAM* ram, u32 insCount);
-
-#endif // !CPU_H
+#endif // INS_H
