@@ -3,4 +3,6 @@ project(6502_emu)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(${PROJECT_NAME} ./source/cpu.c ./source/main.c)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+
+add_executable(${PROJECT_NAME} ./source/cpu.c ./source/main.c ./source/test.c)
