@@ -1,4 +1,4 @@
-#include "test.h"
+#include "../include/test.h"
 #include <stdlib.h>
 
 static void testResetCPU(void) {
