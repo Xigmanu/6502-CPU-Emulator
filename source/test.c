@@ -1,11 +1,11 @@
 #include "../include/test.h"
 #include <stdlib.h>
 
-static void testResetCPU(void) {
+static void test_reset_cpu(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ASSERT_EQUAL(0xFFFC, cpu.pc, "PC");
    ASSERT_EQUAL(0x01FF, cpu.sp, "SP");
@@ -20,14 +20,14 @@ static void testResetCPU(void) {
    ASSERT_EQUAL(0, cpu.x, "X");
    ASSERT_EQUAL(0, cpu.y, "Y");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testJSR(void) {
+static void test_jsr(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = JSR;
    ram->data[0xFFFD] = 0x42;
@@ -40,13 +40,13 @@ static void testJSR(void) {
    ASSERT_EQUAL(0x2444, cpu.pc, "PC");
    ASSERT_EQUAL(8, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
-static void testRTS(void) {
+static void test_rts(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = JSR;
    ram->data[0xFFFD] = 0x42;
@@ -60,14 +60,14 @@ static void testRTS(void) {
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(14, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDAImmediate(void) {
+static void test_lda_imm(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDA_IM;
    ram->data[0xFFFD] = 0x42;
@@ -80,14 +80,14 @@ static void testLDAImmediate(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDAZeroPage(void) {
+static void test_lda_zp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDA_ZP;
    ram->data[0xFFFD] = 0x42;
@@ -100,14 +100,14 @@ static void testLDAZeroPage(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDAZeroPageX(void) {
+static void test_lda_zp_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
    ram->data[0xFFFC] = LDA_ZPX;
@@ -121,14 +121,14 @@ static void testLDAZeroPageX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDAAbsolute(void) {
+static void test_lda_abs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDA_ABS;
    ram->data[0xFFFD] = 0x42;
@@ -142,13 +142,13 @@ static void testLDAAbsolute(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
-static void testLDAAbsoluteX(void) {
+static void test_lda_abs_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
    ram->data[0xFFFC] = LDA_ABSX;
@@ -163,13 +163,13 @@ static void testLDAAbsoluteX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
-static void testLDAAbsoluteY(void) {
+static void test_lda_abs_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.y = 0x10;
    ram->data[0xFFFC] = LDA_ABSY;
@@ -184,13 +184,13 @@ static void testLDAAbsoluteY(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
-static void testLDAIndirectX(void) {
+static void test_lda_ind_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
    ram->data[0xFFFC] = LDA_INDX;
@@ -206,14 +206,14 @@ static void testLDAIndirectX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDAIndirectY(void) {
+static void test_lda_ind_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.y = 0x10;
    ram->data[0xFFFC] = LDA_INDY;
@@ -229,14 +229,14 @@ static void testLDAIndirectY(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDXImmediate(void) {
+static void test_ldx_imm(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDX_IM;
    ram->data[0xFFFD] = 0x42;
@@ -248,13 +248,13 @@ static void testLDXImmediate(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
-static void testLDXZeroPage(void) {
+static void test_ldx_zp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDX_ZP;
    ram->data[0xFFFD] = 0x42;
@@ -267,13 +267,13 @@ static void testLDXZeroPage(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 } 
-static void testLDXZeroPageY(void) {
+static void test_ldx_zp_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    
    cpu.y = 0x10;
    ram->data[0xFFFC] = LDX_ZPY;
@@ -287,13 +287,13 @@ static void testLDXZeroPageY(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
-static void testLDXAbsolute(void) {
+static void test_ldx_abs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDX_ABS;
    ram->data[0xFFFD] = 0x42;
@@ -307,14 +307,14 @@ static void testLDXAbsolute(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDXAbsoluteY(void) {
+static void test_ldx_abs_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.y = 0x10;
    ram->data[0xFFFC] = LDX_ABSY;
@@ -329,14 +329,14 @@ static void testLDXAbsoluteY(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDYImmediate(void) {
+static void test_ldy_imm(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    
    ram->data[0xFFFC] = LDY_IM;
    ram->data[0xFFFD] = 0x42;
@@ -348,14 +348,14 @@ static void testLDYImmediate(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDYZeroPage(void) {
+static void test_ldy_zp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDY_ZP;
    ram->data[0xFFFD] = 0x42;
@@ -368,14 +368,14 @@ static void testLDYZeroPage(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
   
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDYZeroPageX(void) {
+static void test_ldy_zp_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
    ram->data[0xFFFC] = LDY_ZPX;
@@ -389,14 +389,14 @@ static void testLDYZeroPageX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDYAbsolute(void) {
+static void test_ldy_abs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    ram->data[0xFFFC] = LDY_ABS;
    ram->data[0xFFFD] = 0x42;
@@ -410,14 +410,14 @@ static void testLDYAbsolute(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testLDYAbsoluteX(void) {
+static void test_ldy_abs_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.x = 0x10;
    ram->data[0xFFFC] = LDY_ABSX;
@@ -432,14 +432,14 @@ static void testLDYAbsoluteX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(0x0, cpu.z, "Z");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTAZeroPage(void) {
+static void test_sta_zp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    ram->data[0xFFFC] = STA_ZP;
@@ -450,14 +450,14 @@ static void testSTAZeroPage(void) {
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(3, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTAZeroPageX(void) {
+static void test_sta_zp_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.x = 0x24;
@@ -469,14 +469,14 @@ static void testSTAZeroPageX(void) {
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTAAbsolute(void) {
+static void test_sta_abs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    ram->data[0xFFFC] = STA_ABS;
@@ -488,14 +488,14 @@ static void testSTAAbsolute(void) {
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
    
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTAAbsoluteX(void) {
+static void test_sta_abs_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.x = 0x10;
@@ -508,14 +508,14 @@ static void testSTAAbsoluteX(void) {
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(5, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTAAbsoluteY(void) {
+static void test_sta_abs_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.y = 0x10;
@@ -528,14 +528,14 @@ static void testSTAAbsoluteY(void) {
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(5, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTAIndirectX(void) {
+static void test_sta_ind_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.x = 0x10;
@@ -549,14 +549,14 @@ static void testSTAIndirectX(void) {
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(6, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTAIndirectY(void) {
+static void test_sta_ind_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.y = 0x10;
@@ -570,14 +570,14 @@ static void testSTAIndirectY(void) {
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(6, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTXZeroPage(void) {
+static void test_stx_zp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.x = 0x42;
    ram->data[0xFFFC] = STX_ZP;
@@ -588,14 +588,14 @@ static void testSTXZeroPage(void) {
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(3, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTXZeroPageY(void) {
+static void test_stx_zp_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.x = 0x42;
    cpu.y = 0x10;
@@ -607,14 +607,14 @@ static void testSTXZeroPageY(void) {
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
    
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTXAbsolute(void) {
+static void test_stx_abs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.x = 0x42;
    ram->data[0xFFFC] = STX_ABS;
@@ -626,14 +626,14 @@ static void testSTXAbsolute(void) {
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
    
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTYZeroPage(void) {
+static void test_sty_zp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.y = 0x42;
    ram->data[0xFFFC] = STY_ZP;
@@ -644,14 +644,14 @@ static void testSTYZeroPage(void) {
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(3, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTYZeroPageX(void) {
+static void test_sty_zp_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.x = 0x42;
    cpu.y = 0x10;
@@ -663,14 +663,14 @@ static void testSTYZeroPageX(void) {
    ASSERT_EQUAL(0xFFFE, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testSTYAbsolute(void) {
+static void test_sty_abs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.y = 0x42;
    ram->data[0xFFFC] = STY_ABS;
@@ -682,14 +682,14 @@ static void testSTYAbsolute(void) {
    ASSERT_EQUAL(0xFFFF, cpu.pc, "PC");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testTAX(void) {
+static void test_tax(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   resetCPU(&cpu, 0xFFFC);
-   struct RAM* ram = initRAM();
+   reset_cpu(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
 
    cpu.a = 0x42;
    ram->data[0xFFFC] = TAX;
@@ -699,14 +699,14 @@ static void testTAX(void) {
    ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testTXA(void) {
+static void test_txa(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   resetCPU(&cpu, 0xFFFC);
-   struct RAM* ram = initRAM();
+   reset_cpu(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
 
    cpu.x = 0x42;
    ram->data[0xFFFC] = TXA;
@@ -716,14 +716,14 @@ static void testTXA(void) {
    ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testTAY(void) {
+static void test_tay(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   resetCPU(&cpu, 0xFFFC);
-   struct RAM* ram = initRAM();
+   reset_cpu(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
 
    cpu.a = 0x42;
    ram->data[0xFFFC] = TAY;
@@ -733,14 +733,14 @@ static void testTAY(void) {
    ASSERT_EQUAL(0xFFFD, cpu.pc, "PC");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testTYA(void) {
+static void test_tya(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   resetCPU(&cpu, 0xFFFC);
-   struct RAM* ram = initRAM();
+   reset_cpu(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
 
    cpu.y = 0xBE;
    ram->data[0xFFFC] = TYA;
@@ -757,14 +757,14 @@ static void testTYA(void) {
    ASSERT_EQUAL(0x1, cpu.n, "N");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testTSX(void) {
+static void test_tsx(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   resetCPU(&cpu, 0xFFFC);
-   struct RAM* ram = initRAM();
+   reset_cpu(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
 
    cpu.sp = 0x42;
    ram->data[0xFFFC] = TSX;
@@ -781,14 +781,14 @@ static void testTSX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testTXS(void) {
+static void test_txs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   resetCPU(&cpu, 0xFFFC);
-   struct RAM* ram = initRAM();
+   reset_cpu(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
    
    cpu.x = 0x42;
    ram->data[0xFFFC] = TXS;
@@ -805,14 +805,14 @@ static void testTXS(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testPHA(void) {
+static void test_pha(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   resetCPU(&cpu, 0xFFFC);
-   struct RAM* ram = initRAM();
+   reset_cpu(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
 
    cpu.a = 0x42;
    ram->data[0xFFFC] = PHA;
@@ -830,14 +830,14 @@ static void testPHA(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(3, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testPHP(void) {
+static void test_php(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   resetCPU(&cpu, 0xFFFC);
-   struct RAM* ram = initRAM();
+   reset_cpu(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
 
    ram->data[0xFFFC] = LDA_IM;
    ram->data[0xFFFD] = 0xBE;
@@ -856,14 +856,14 @@ static void testPHP(void) {
    ASSERT_EQUAL(0x1, cpu.n, "N");
    ASSERT_EQUAL(5, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testPLA(void) {
+static void test_pla(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   resetCPU(&cpu, 0xFFFC);
-   struct RAM* ram = initRAM();
+   reset_cpu(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
    
    cpu.sp = 0x01FE;
    ram->data[0x01FE] = 0x42;
@@ -882,14 +882,14 @@ static void testPLA(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testPLP(void) {
+static void test_plp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   resetCPU(&cpu, 0xFFFC);
-   struct RAM* ram = initRAM();
+   reset_cpu(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
 
    cpu.sp = 0x01FE;
    ram->data[0x01FE] = 0x81;
@@ -908,14 +908,14 @@ static void testPLP(void) {
    ASSERT_EQUAL(0x1, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testANDImmediate(void) {
+static void test_and_imm(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
    ram->data[0xFFFC] = AND_IM;
@@ -934,14 +934,14 @@ static void testANDImmediate(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testANDZeroPage(void) {
+static void test_and_zp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
    ram->data[0x0001] = 0x42;
@@ -961,14 +961,14 @@ static void testANDZeroPage(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(3, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testANDZeroPageX(void) {
+static void test_and_zp_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.x = 0x10;
    
@@ -989,14 +989,14 @@ static void testANDZeroPageX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testANDAbsolute(void) {
+static void test_and_abs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
    ram->data[0xFFFC] = AND_ABS;
@@ -1017,14 +1017,14 @@ static void testANDAbsolute(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testANDAbsoluteX(void) {
+static void test_and_abs_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.x = 0x10;
 
@@ -1046,14 +1046,14 @@ static void testANDAbsoluteX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testANDAbsoluteY(void) {
+static void test_and_abs_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.y = 0x10;
 
@@ -1075,14 +1075,14 @@ static void testANDAbsoluteY(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testANDIndirectX(void) {
+static void test_and_ind_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.x = 0x10;
@@ -1105,14 +1105,14 @@ static void testANDIndirectX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(6, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testANDIndirectY(void) {
+static void test_and_ind_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.y = 0x10;
@@ -1135,14 +1135,14 @@ static void testANDIndirectY(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(5, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testEORImmediate(void) {
+static void test_eor_imm(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
    ram->data[0xFFFC] = EOR_IM;
@@ -1161,14 +1161,14 @@ static void testEORImmediate(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testEORZeroPage(void) {
+static void test_eor_zp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
    ram->data[0x0001] = 0x42;
@@ -1188,14 +1188,14 @@ static void testEORZeroPage(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(3, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testEORZeroPageX(void) {
+static void test_eor_zp_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.x = 0x10;
 
@@ -1216,14 +1216,14 @@ static void testEORZeroPageX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testEORAbsolute(void) {
+static void test_eor_abs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
    ram->data[0xFFFC] = EOR_ABS;
@@ -1244,14 +1244,14 @@ static void testEORAbsolute(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testEORAbsoluteX(void) {
+static void test_eor_abs_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.y = 0x10;
 
@@ -1273,14 +1273,14 @@ static void testEORAbsoluteX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testEORAbsoluteY(void) {
+static void test_eor_abs_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.y = 0x10;
 
@@ -1302,14 +1302,14 @@ static void testEORAbsoluteY(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testEORIndirectX(void) {
+static void test_eor_ind_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.x = 0x10;
@@ -1332,14 +1332,14 @@ static void testEORIndirectX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(6, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testEORIndirectY(void) {
+static void test_eor_ind_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.y = 0x10;
@@ -1362,14 +1362,14 @@ static void testEORIndirectY(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(5, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testORAImmediate(void) {
+static void test_ora_imm(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
    ram->data[0xFFFC] = ORA_IM;
@@ -1388,14 +1388,14 @@ static void testORAImmediate(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(2, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testORAZeroPage(void) {
+static void test_ora_zp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
    ram->data[0x0001] = 0x55;
@@ -1415,14 +1415,14 @@ static void testORAZeroPage(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(3, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testORAZeroPageX(void) {
+static void test_ora_zp_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.x = 0x10;
 
@@ -1443,14 +1443,14 @@ static void testORAZeroPageX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testORAAbsolute(void) {
+static void test_ora_abs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
 
    ram->data[0xFFFC] = ORA_ABS;
@@ -1471,14 +1471,14 @@ static void testORAAbsolute(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testORAAbsoluteX(void) {
+static void test_ora_abs_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.y = 0x10;
 
@@ -1500,14 +1500,14 @@ static void testORAAbsoluteX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testORAAbsoluteY(void) {
+static void test_ora_abs_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
    cpu.a = 0x24;
    cpu.y = 0x10;
 
@@ -1529,14 +1529,14 @@ static void testORAAbsoluteY(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testORAIndirectX(void) {
+static void test_ora_ind_x(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.x = 0x10;
@@ -1559,14 +1559,14 @@ static void testORAIndirectX(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(6, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testORAIndirectY(void) {
+static void test_ora_ind_y(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0x42;
    cpu.y = 0x10;
@@ -1589,14 +1589,14 @@ static void testORAIndirectY(void) {
    ASSERT_EQUAL(0x0, cpu.n, "N");
    ASSERT_EQUAL(5, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testBITZeroPage(void) {
+static void test_bit_zp(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0xFF;
    ram->data[0x0041] = 0xC3;
@@ -1616,14 +1616,14 @@ static void testBITZeroPage(void) {
    ASSERT_EQUAL(0x1, cpu.n, "N");
    ASSERT_EQUAL(3, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
-static void testBITAbsolute(void) {
+static void test_bit_abs(void) {
    PRINT_TEST_NAME();
    struct CPU cpu;
-   struct RAM* ram = initRAM();
-   resetCPU(&cpu, 0xFFFC);
+   struct RAM* ram = init_ram();
+   reset_cpu(&cpu, 0xFFFC);
 
    cpu.a = 0xA5;
    ram->data[0x5141] = 0xC3;
@@ -1644,85 +1644,84 @@ static void testBITAbsolute(void) {
    ASSERT_EQUAL(0x1, cpu.n, "N");
    ASSERT_EQUAL(4, cpu.cycles, "Cycles");
 
-   freeRAM(ram);
+   free_ram(ram);
 }
 
 void(*tests[])(void) = {
-   &testResetCPU,
-   &testJSR,
-   &testRTS,
-   &testLDAImmediate,
-   &testLDAZeroPage,
-   &testLDAZeroPageX,
-   &testLDAAbsolute,
-   &testLDAAbsoluteX,
-   &testLDAAbsoluteY,
-   &testLDAIndirectX,
-   &testLDAIndirectY,
-   &testLDXImmediate,
-   &testLDXZeroPage,
-   &testLDAZeroPageX,
-   &testLDXZeroPageY,
-   &testLDXAbsolute,
-   &testLDXAbsoluteY,
-   &testLDYImmediate,
-   &testLDYZeroPage,
-   &testLDYZeroPageX,
-   &testLDYAbsolute,
-   &testLDYAbsoluteX,
-   &testSTAZeroPage,
-   &testSTAZeroPageX,
-   &testSTAAbsolute,
-   &testSTAAbsoluteX,
-   &testSTAAbsoluteY,
-   &testSTAIndirectX,
-   &testSTAIndirectY,
-   &testSTXZeroPage,
-   &testSTXZeroPageY,
-   &testSTXAbsolute,
-   &testSTYZeroPage,
-   &testSTYZeroPageX,
-   &testSTYAbsolute,
-   &testTAX,
-   &testTXA,
-   &testTAY,
-   &testTYA,
-   &testTSX,
-   &testTXS,
-   &testPHA,
-   &testPHP,
-   &testPLA,
-   &testPLP,
-   &testANDImmediate,
-   &testANDZeroPage,
-   &testANDZeroPageX,
-   &testANDAbsolute,
-   &testANDAbsoluteX,
-   &testANDAbsoluteY,
-   &testANDIndirectX,
-   &testANDIndirectY,
-   &testEORImmediate,
-   &testEORZeroPage,
-   &testEORZeroPageX,
-   &testEORAbsolute,
-   &testEORAbsoluteX,
-   &testEORAbsoluteY,
-   &testEORIndirectX,
-   &testEORIndirectY,
-   &testORAImmediate,
-   &testORAZeroPage,
-   &testORAZeroPageX,
-   &testORAAbsolute,
-   &testORAAbsoluteX,
-   &testORAAbsoluteY,
-   &testORAIndirectX,
-   &testORAIndirectY,
-   &testBITZeroPage,
-   &testBITAbsolute
+   &test_reset_cpu,
+   &test_jsr,
+   &test_rts,
+   &test_lda_imm,
+   &test_lda_zp,
+   &test_lda_zp_x,
+   &test_lda_abs,
+   &test_lda_abs_x,
+   &test_lda_abs_y,
+   &test_lda_ind_x,
+   &test_lda_ind_y,
+   &test_ldx_imm,
+   &test_ldx_zp,
+   &test_ldx_zp_y,
+   &test_ldx_abs,
+   &test_ldx_abs_y,
+   &test_ldy_imm,
+   &test_ldy_zp,
+   &test_ldy_zp_x,
+   &test_ldy_abs,
+   &test_ldy_abs_x,
+   &test_sta_zp,
+   &test_sta_zp_x,
+   &test_sta_abs,
+   &test_sta_abs_x,
+   &test_sta_abs_y,
+   &test_sta_ind_x,
+   &test_sta_ind_y,
+   &test_stx_zp,
+   &test_stx_zp_y,
+   &test_stx_abs,
+   &test_sty_zp,
+   &test_sty_zp_x,
+   &test_sty_abs,
+   &test_tax,
+   &test_txa,
+   &test_tay,
+   &test_tya,
+   &test_tsx,
+   &test_txs,
+   &test_pha,
+   &test_php,
+   &test_pla,
+   &test_plp,
+   &test_and_imm,
+   &test_and_zp,
+   &test_and_zp_x,
+   &test_and_abs,
+   &test_and_abs_x,
+   &test_and_abs_y,
+   &test_and_ind_x,
+   &test_and_ind_y,
+   &test_eor_imm,
+   &test_eor_zp,
+   &test_eor_zp_x,
+   &test_eor_abs,
+   &test_eor_abs_x,
+   &test_eor_abs_y,
+   &test_eor_ind_x,
+   &test_eor_ind_y,
+   &test_ora_imm,
+   &test_ora_zp,
+   &test_ora_zp_x,
+   &test_ora_abs,
+   &test_ora_abs_x,
+   &test_ora_abs_y,
+   &test_ora_ind_x,
+   &test_ora_ind_y,
+   &test_bit_zp,
+   &test_bit_abs
 };
 
-void runTests() {
-   for (u32 i = 0; i <= TEST_COUNT; i++) {
+void run_tests() {
+   for (uint32_t i = 0; i <= TEST_COUNT; i++) {
       if (NULL != tests[i]) {
          tests[i]();
       }

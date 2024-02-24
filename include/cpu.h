@@ -35,9 +35,9 @@ struct CPU {
    uint32_t cycles;
 };
 
-void resetCPU(struct CPU* cpu, word sPC);
-struct RAM* initRAM();
-void freeRAM(struct RAM* ram);
+void reset_cpu(struct CPU* cpu, word sPC);
+struct RAM* init_ram();
+void free_ram(struct RAM* ram);
 int exec(struct CPU* cpu, struct RAM* ram, uint32_t insCount);
 
 #endif // CPU_H
